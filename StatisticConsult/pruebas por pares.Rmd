@@ -1,0 +1,302 @@
+---
+title: "Frozen Embryos"
+author: "Miguel Angel Peñaloza Perez"
+date: "15/11/2021"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r,echo=FALSE,warning=FALSE}
+library(readxl)
+library(ggplot2)
+library(ggstatsplot)
+
+froze<-read_excel("C:\\Users\\elektra\\Downloads\\KiWu_Draft_05_STATA_labels_AVI 21.06.2021 Anonym 1.2  .xlsx")
+
+ggbarstats(
+  data = froze,
+  x = Gruppe_Luteal,
+  y = Endometrium_gt_7
+) +
+  labs(caption = NULL) # remove caption
+
+ggbarstats(
+  data = froze,
+  x = Gruppe_Luteal,
+  y = Abbruch
+) +
+  labs(caption = NULL) # remove caption
+
+ggbarstats(
+  data = froze,
+  x = Gruppe_Luteal,
+  y = Embryoglue
+) +
+  labs(caption = NULL) # remove caption
+
+ggbarstats(
+  data = froze,
+  x = Gruppe_Luteal,
+  y = Ass_Hatching
+) +
+  labs(caption = NULL) # remove caption
+
+ggbarstats(
+  data = froze,
+  x = Gruppe_Luteal,
+  y = Anz_Embryonen
+) +
+  labs(caption = NULL) # remove caption
+
+ggbarstats(
+  data = froze,
+  x = Gruppe_Luteal,
+  y = Befruchtung
+) +
+  labs(caption = NULL) # remove caption
+
+ggbarstats(
+  data = froze,
+  x = Gruppe_Luteal,
+  y = Befruchtung_2
+) +
+  labs(caption = NULL) # remove caption
+
+ggbarstats(
+  data = froze,
+  x = Gruppe_Luteal,
+  y = Biochem_SS
+) +
+  labs(caption = NULL) # remove caption
+
+ggbarstats(
+  data = froze,
+  x = Gruppe_Luteal,
+  y = HCG_gt_100
+) +
+  labs(caption = NULL) # remove caption
+
+
+ggbarstats(
+  data = froze,
+  x = Gruppe_Luteal,
+  y = Anz_Fruchtblase_init
+) +
+  labs(caption = NULL) # remove caption
+
+ggbarstats(
+  data = froze,
+  x = Gruppe_Luteal,
+  y = Anz_Fruchtblase_SSW12
+) +
+  labs(caption = NULL) # remove caption
+
+ggbarstats(
+  data = froze,
+  x = Gruppe_Luteal,
+  y = Fetale_Reduktion
+) +
+  labs(caption = NULL) # remove caption
+
+
+ggbarstats(
+  data = froze,
+  x = Gruppe_Luteal,
+  y = Abort_lt_12
+) +
+  labs(caption = NULL) # remove caption
+
+
+ggbarstats(
+  data = froze,
+  x = Gruppe_Luteal,
+  y = Spaetabort
+) +
+  labs(caption = NULL) # remove caption
+
+ggbarstats(
+  data = froze,
+  x = Gruppe_Luteal,
+  y = EUG
+) +
+  labs(caption = NULL) # remove caption
+
+ggbarstats(
+  data = froze,
+  x = Gruppe_Luteal,
+  y = Heterotope_EUG
+) +
+  labs(caption = NULL) # remove caption
+
+ggbarstats(
+  data = froze,
+  x = Gruppe_Luteal,
+  y = Abort_Induktion
+) +
+  labs(caption = NULL) # remove caption
+
+ggbarstats(
+  data = froze,
+  x = Gruppe_Luteal,
+  y = Blutung_1_Trim
+) +
+  labs(caption = NULL) # remove caption
+
+
+ggbarstats(
+  data = froze,
+  x = Gruppe_Luteal,
+  y = Blutung_2_Trim
+) +
+  labs(caption = NULL) # remove caption
+
+ggbarstats(
+  data = froze,
+  x = Gruppe_Luteal,
+  y = Blutung_3_Trim
+) +
+  labs(caption = NULL) # remove caption
+
+ggbarstats(
+  data = froze,
+  x = Gruppe_Luteal,
+  y = GDM
+) +
+  labs(caption = NULL) # remove caption
+
+ggbarstats(
+  data = froze,
+  x = Gruppe_Luteal,
+  y = Vorztg_Wehen_Cerklage
+) +
+  labs(caption = NULL) # remove caption
+
+
+ggbarstats(
+  data = froze,
+  x = Gruppe_Luteal,
+  y = Vorztg_Wehen_2_T
+) +
+  labs(caption = NULL) # remove caption
+
+ggbarstats(
+  data = froze,
+  x = Gruppe_Luteal,
+  y = Vorztg_Wehen_3_T
+) +
+  labs(caption = NULL) # remove caption
+
+ggbarstats(
+  data = froze,
+  x = Gruppe_Luteal,
+  y = Plazenta_Praevia
+) +
+  labs(caption = NULL) # remove caption
+
+ggbarstats(
+  data = froze,
+  x = Gruppe_Luteal,
+  y = Isolierte_Hypertonie
+) +
+  labs(caption = NULL) # remove caption
+
+ggbarstats(
+  data = froze,
+  x = Gruppe_Luteal,
+  y = Praeklampsie
+) +
+  labs(caption = NULL) # remove caption
+
+ggbarstats(
+  data = froze,
+  x = Gruppe_Luteal,
+  y = Eklampsie
+) +
+  labs(caption = NULL) # remove caption
+
+
+ggbarstats(
+  data = froze,
+  x = Gruppe_Luteal,
+  y = Psychol_Probleme
+) +
+  labs(caption = NULL) # remove caption
+
+ggbarstats(
+  data = froze,
+  x = Gruppe_Luteal,
+  y = IUWR
+) +
+  labs(caption = NULL) # remove caption
+
+ggbarstats(
+  data = froze,
+  x = Gruppe_Luteal,
+  y = Hospital_1_T
+) +
+  labs(caption = NULL) # remove caption
+
+ggbarstats(
+  data = froze,
+  x = Gruppe_Luteal,
+  y = Hospital_2_T
+) +
+  labs(caption = NULL) # remove caption
+
+ggbarstats(
+  data = froze,
+  x = Gruppe_Luteal,
+  y = Hospital_3_T
+) +
+  labs(caption = NULL) # remove caption
+
+ggbarstats(
+  data = froze,
+  x = Gruppe_Luteal,
+  y = Cholestase
+) +
+  labs(caption = NULL) # remove caption
+
+ggbarstats(
+  data = froze,
+  x = Gruppe_Luteal,
+  y = Geburt
+) +
+  labs(caption = NULL) # remove caption
+
+ggbarstats(
+  data = froze,
+  x = Gruppe_Luteal,
+  y = Kinder_gesund
+) +
+  labs(caption = NULL) # remove caption
+
+
+ggbarstats(
+  data = froze,
+  x = Gruppe_Luteal,
+  y = Kinder_tot
+) +
+  labs(caption = NULL) # remove caption
+
+
+ggbarstats(
+  data = froze,
+  x = Gruppe_Luteal,
+  y = Kinder_Fehlbildung
+) +
+  labs(caption = NULL) # remove caption
+
+
+
+
+
+
+
+
+
+```
+

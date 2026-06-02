@@ -1,0 +1,129 @@
+---
+title: "Pairwise comparison between groups"
+author: ""
+date: "16/11/2021"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r,echo=FALSE,warning=FALSE}
+
+library(readxl)
+library(tidyverse)
+library(ggplot2)
+library(dplyr)
+library(MASS)
+library(rstatix)
+froze<-read_excel("C:\\Users\\elektra\\Downloads\\KiWu_Draft_05_STATA_labels_AVI 21.06.2021 Anonym 1.2  .xlsx")
+#############################################
+print("Embryoglue")
+embryoglue<-table(froze$Embryoglue,froze$Gruppe_Luteal)
+fisher_test(embryoglue, detailed = TRUE)
+pairwise_fisher_test(embryoglue)
+
+#############################################
+print("Ass_Hatching")
+hashat<-table(froze$Ass_Hatching,froze$Gruppe_Luteal)
+fisher_test(hashat, detailed = TRUE)
+pairwise_fisher_test(hashat)
+
+#############################################
+print("Anz_Embryonen")
+anz<-table(froze$Anz_Embryonen,froze$Gruppe_Luteal)
+fisher_test(anz, detailed = TRUE)
+pairwise_fisher_test(anz)
+
+#########################################
+print("Biochem_SS")
+biochem<-table(froze$Biochem_SS,froze$Gruppe_Luteal)
+fisher_test(biochem, detailed = TRUE)
+pairwise_fisher_test(biochem)
+#########################################
+print("HCG_gt_100")
+HCG<-table(froze$HCG_gt_100,froze$Gruppe_Luteal)
+fisher_test(HCG, detailed = TRUE)
+pairwise_fisher_test(HCG)
+###########################################3
+print("Anz_Fruchtblase_init")
+ANZ<-table(froze$Anz_Fruchtblase_init,froze$Gruppe_Luteal)
+fisher_test(ANZ, detailed = TRUE)
+pairwise_fisher_test(ANZ)
+#################################################
+"Anz_Fruchtblase_SSW12"
+ANZ_2<-table(froze$Anz_Fruchtblase_SSW12,froze$Gruppe_Luteal)
+fisher_test(ANZ_2, detailed = TRUE)
+pairwise_fisher_test(ANZ_2)
+#############################################33
+################################################
+print("Fetale_Reduktion")
+fet_red<-table(froze$Fetale_Reduktion,froze$Gruppe_Luteal)
+fisher_test(fet_red, detailed = TRUE)
+pairwise_fisher_test(fet_red)
+##########################################333
+print("Abort_lt_12")
+abort_lt12<-table(froze$Abort_lt_12,froze$Gruppe_Luteal)
+fisher_test(abort_lt12, detailed = TRUE)
+pairwise_fisher_test(abort_lt12)
+################################################
+print("EUG")
+EUGG<-table(froze$EUG,froze$Gruppe_Luteal)
+fisher_test(EUGG, detailed = TRUE)
+pairwise_fisher_test(EUGG)
+############################333
+print("Blutung_1_Trim")
+blutung<-table(froze$Blutung_1_Trim,froze$Gruppe_Luteal)
+fisher_test(blutung, detailed = TRUE)
+pairwise_fisher_test(blutung)
+#################################33
+print("Blutung_2_Trim")
+blutung2<-table(froze$Blutung_2_Trim,froze$Gruppe_Luteal)
+fisher_test(blutung2, detailed = TRUE)
+pairwise_fisher_test(blutung)
+#########################################
+print("Blutung_3_Trim")
+blutung3<-table(froze$Blutung_3_Trim,froze$Gruppe_Luteal)
+fisher_test(blutung, detailed = TRUE)
+pairwise_fisher_test(blutung3)
+#########################################3
+print("GDM")
+gdmm<-table(froze$GDM,froze$Gruppe_Luteal)
+fisher_test(gdmm, detailed = TRUE)
+pairwise_fisher_test(gdmm)
+##############################
+print("Praeklampsie")
+preklam<-table(froze$Praeklampsie,froze$Gruppe_Luteal)
+fisher_test(preklam, detailed = TRUE)
+pairwise_fisher_test(preklam)
+#####################################3
+print("IUWR")
+IUUU<-table(froze$IUWR,froze$Gruppe_Luteal)
+fisher_test(IUUU, detailed = TRUE)
+pairwise_fisher_test(blutung)
+#######################################33
+print("Hospital_2_T")
+hosp2<-table(froze$Hospital_2_T,froze$Gruppe_Luteal)
+fisher_test(hosp2, detailed = TRUE)
+pairwise_fisher_test(hosp2)
+#########################################
+print("Hospital_3_T")
+hosp3<-table(froze$Hospital_3_T,froze$Gruppe_Luteal)
+fisher_test(hosp3, detailed = TRUE)
+pairwise_fisher_test(hosp2)
+############################################
+print("Kinder_gesund")
+kinder<-table(froze$Kinder_gesund,froze$Gruppe_Luteal)
+fisher_test(kinder, detailed = TRUE)
+pairwise_fisher_test(kinder)
+#######################################333
+print("Kinder_tot")
+kindertot<-table(froze$Kinder_tot,froze$Gruppe_Luteal)
+fisher_test(kindertot, detailed = TRUE)
+pairwise_fisher_test(hosp2)
+#####################################3333
+########################################
+
+```
+

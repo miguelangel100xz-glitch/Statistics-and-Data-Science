@@ -1,0 +1,46 @@
+---
+title: "Pairwise test(Clinical pregnancy, Ongoing pregnancy, Live births)"
+output: pdf_document
+classoption: landscape
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r echo=FALSE,warning=FALSE}
+
+library(readxl)
+library(tidyverse)
+library(ggplot2)
+library(dplyr)
+library(MASS)
+library(rstatix)
+froze<-read_excel("C:\\Users\\elektra\\Downloads\\KiWu_Draft_05_STATA_labels_AVI 21.06.2021 Anonym 1.2  .xlsx")
+#############################################
+
+froze<-froze%>%mutate(Gruppe_Luteal=case_when(Gruppe_Luteal=="Crinone"~"Vaginal progesterone gel",
+                                              Gruppe_Luteal=="Crinone + Duphaston"~"Oral dydrogesterone+ vaginal progesterone gel",
+                                              Gruppe_Luteal=="Duphaston"~"Oral dydrogesterone",
+                                              Gruppe_Luteal=="Utrogestan"~"Vaginal progesterone capsules",
+                                              Gruppe_Luteal=="Prolutex"~"Subcutaneous injection"))
+
+
+
+print("Clinical Pregnancy")
+ANZ<-table(froze$Anz_Fruchtblase_init,froze$Gruppe_Luteal)
+fisher_test(ANZ, detailed = TRUE)
+j<-pairwise_fisher_test(ANZ)
+j[,-3]
+print("Ongoing Pregnancy")
+ANZ_2<-table(froze$Anz_Fruchtblase_SSW12,froze$Gruppe_Luteal)
+fisher_test(ANZ_2, detailed = TRUE)
+pairwise_fisher_test(ANZ_2)
+
+print("Live Births")
+kinder<-table(froze$Kinder_gesund,froze$Gruppe_Luteal)
+fisher_test(kinder, detailed = TRUE)
+pairwise_fisher_test(kinder)
+
+```
+
