@@ -1,0 +1,207 @@
+---
+title: "Estimación de la Tendencia en la Mortalidad Materna en México (2008-2020) por Entidad Federativa mediante técnica Bootstrap"
+author: "Poyecto de Consultoria Estadistica"
+date: "6/12/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Resumen
+
+La mortalidad a causa del proceso gestacional-obstétrico en mujeres de entre 15-49 años es un problema de atención a la salud de interés mundial es tanta la importancia que la ONU estableció la reducción de la mortalidad como tercer objetivo en la agenda de desarrollo sostenible. En México se estima que los registros de mortalidad materna están subestimados entre 30% y 40% dependiendo de la entidad federativa por mala práctica del personal que registra las causas de defunción. 
+
+Objetivos: Estimar el incremento de la mortalidad materna por entidad federativa en México entre el periodo de los años 2008-2020.
+
+Materiales y métodos: Se extrajeron de bases de datos oficiales de la secretaria de salud del portal de datos abiertos de México los registros de nacimientos en el periodo 2008-2020. A su vez se seleccionaron los casos de mortalidad materna por entidad federativa en el periodo 2008-2020. Después se obtuvieron los porcentajes de muertes maternas por entidad federativa para el periodo 2008-2020. Se utilizo una técnica Bootstrap para la estimación de los intervalos de confianza al 95% por el método de los percentiles para identificar la tendencia de las muertes maternas en México por entidad federativa utilizándose 10,000 re-muestreos.
+
+Resultados: Los estados que presentaron un incremento sobresaliente en la mortalidad materna en el periodo 2008-2020 en México fueron las entidades de Aguascalientes (4.99-7.64; IC 95%), Campeche (3.97-6.62; IC 95%), Oaxaca (3.98-5.96; IC 95%), Nuevo León (3.63-5.55; IC 95%). Las entidades federativas que mantuvieron una tasa de mortalidad materna sin cambios en el periodo 2008-2020 fueron: Chihuahua ([-0.745]-1.197; IC 95%), Veracruz (0.775-0.932; IC 95%) y Nayarit ([-1.225]-1.378; IC 95%). Por otro lado los estados que presentaron una disminución en la mortalidad materna fueron Baja California ([-3.053]- [-1.24]; IC 95%), Tlaxcala ([-2.249]-[-0.425] ; IC 95%), Michoacán ([-2.2490]-[-0.425] ; IC 95%).
+
+Conclusiones: Los intervalos de confianza para la estimación del incremento en el periodo 2008-2020 de la mortalidad materna por entidad federativa son útiles para solucionar el problema de subestimación de la mortalidad materna en México. Lo anterior es necesario ya que con las estimaciones obtenidas del incremento de la mortalidad materna por entidad federativa es posible implementar estrategias para reducir la mortalidad materna a nivel estatal. A si también establecer estrategias oportunas dirigidas a los estados con un alto incremento de la mortalidad materna en el país mexicano.
+
+Palabras clave: Mortalidad materna, Bootstrap, estimación de la mortalidad materna, intervalos de confianza, entidades federativas en México, periodo 2008-2020.
+
+Visita el proyecto completo en: 
+https://consultoriaestadisticafei.blogspot.com/
+
+Base de datos del repositorio oficial de datos abiertos de México:
+http://www.dgis.salud.gob.mx/contenidos/basesdedatos/da_nacimientos_gobmx.html
+
+
+```{r}
+#Cargamos las librerias y la base de datos
+library(rsample)
+library(ggplot2)
+library(dplyr)
+library(tidyverse)
+
+Mortalidad_Materna<-read.csv(header=TRUE,"C:\\Users\\elektra\\OneDrive - Universidad Veracruzana\\CONSULTORIA\\PROYECTO FINAL\\BOOPSTRAP_NACIMIENTOS_2008_2020.csv")
+
+
+Mortalidad_Materna %>%
+  select(Anio, AGUASCALIENTES:ZACATECAS,BAJA_CALIFONIA:VERACRUZ) %>%
+  pivot_longer(AGUASCALIENTES:VERACRUZ) %>%
+  group_by(Anio, name) %>%
+  summarise(prop = mean(value)) %>%
+  ungroup() %>%
+  ggplot(aes(Anio, prop, color = name)) +
+  geom_line(size = 1.2, show.legend = FALSE) +
+  facet_wrap(vars(name),scales = "free") +
+  scale_y_continuous(labels = scales::percent) +
+  labs(x = NULL, y = "% de muertes maternas",title="Comportamiento de la Mortalidad Materna por Entidad Federativa")
+
+Mortalidad_Materna1<-dplyr::select(Mortalidad_Materna,-id,-X)
+simple_mod <- lm(Anio ~ .,
+                 data = Mortalidad_Materna1
+)
+
+
+
+```
+
+
+```{r}
+
+bootstraps(Mortalidad_Materna1, times = 1e3)
+
+set.seed(123)
+intervalos <- reg_intervals(Anio ~ AGUASCALIENTES+
+                                     BAJA_CALIFONIA+
+                                     BAJA_CALIFORNIA_SUR+
+                                     CAMPECHE+
+                                     COAHUILA+
+                                     COLIMA+
+                                     CHIAPAS+
+                                     CHIHUAHUA+
+                                     DF+
+                                     DURANGO+
+                                     GUANAJUATO+
+                                     GUERRERO+
+                                     HIDALGO+
+                                     JALISCO+
+                                     MICHOACAN+
+                                     MORELOS+
+                                     NAYARIT+
+                                     NUEVO_LEON+
+                                     OAXACA+
+                                     PUEBLA+
+                                     QUERETARO+
+                                     QUINTANA_ROO+
+                                     SAN_LUIS_POTOSI+
+                                     SINALOA+
+                                     SONORA+
+                                     TABASCO+
+                                     TAMAULIPAS+
+                                     TLAXCALA+
+                                     VERACRUZ+
+                                     YUCATAN+
+                                     ZACATECAS, data = Mortalidad_Materna1,
+                                   type = "percentile",
+                                   keep_reps = TRUE
+)
+
+#obtenemos los intervalos
+intervalos %>%
+  mutate(
+    term = str_remove(term, "TRUE"),
+    term = fct_reorder(term, .estimate)
+  ) %>%
+  ggplot(aes(.estimate, term)) +
+  geom_vline(xintercept = 0, size = 1.5, lty = 2, color = "gray80") +
+  geom_errorbarh(aes(xmin = .lower, xmax = .upper),
+                 size = 1.5, alpha = 0.5, color = "midnightblue"
+  ) +
+  geom_point(size = 3, color = "midnightblue") +
+  labs(title="Intervalos de Confianza Bootstrap por Entidad Federativa",
+    x = "Incremento de las Muertes Maternas",
+    y = NULL
+  )
+
+intervalos %>%
+  mutate(
+    term = str_remove(term, "TRUE"),
+    term = fct_reorder(term, .estimate)
+  ) %>%
+  unnest(.replicates) %>%
+  ggplot(aes(estimate, fill = term)) +
+  geom_vline(xintercept = 0, size = 1.5, lty = 2, color = "gray50") +
+  geom_histogram(alpha = 0.8, show.legend = FALSE) +
+  facet_wrap(vars(term),scales = "free")+
+  labs(title="Distribución de Intervalos de Confianza Bootstrap al 95% por Entidad Federativa",
+       x="Estimaciones",y="")
+
+
+
+
+```
+
+## Intervalos de confianza por entidad federativa 
+
+```{r}
+intervalos
+```
+
+
+## Referencias
+
+Calderón, M. A. K., Montes, P. B., González, M. C., & Pliego, Á. C. (2007). Aspectos sociales de la mortalidad materna. Estudio de caso en el Estado de México. Medicina Social, 2(4), 205-211.
+
+Montesano-Delfín, J. R., Hernández, A., Zapién-Moreno, J., Olivares-Durán, E., Guizar-Mendoza, J. M., & Luna-Ruiz, M. Á. (2009). Mortalidad materna: enlace entre gestión directiva y atención clínica oportuna. Revista Médica del Instituto Mexicano del Seguro Social, 47(1), 109-116.
+
+Aguilar-Vargas, E., Azcorra, H., Novelo-Pérez, J. P., Gómez-Carro, S., & Méndez-Domínguez, N. (2018). Descripción de la variación estacional en la mortalidad materna de México y el estado de Yucatán 2002-2016. Ginecología y obstetricia de México, 86(10), 640-649.
+
+Langer, A., & Hernández, B. (2000). La mortalidad materna. Una prioridad para la investigación y la acción. Gac Med Mex, 136(Supl 3), S49-S53.
+
+Garduño, J. C. B., de León Ponce, M. D., & Calderón, J. M. (2009). Estrategias para reducir la mortalidad materna hospitalaria en el Estado de México. Rev Asoc Mex Med Crit y Ter Int.[Internet], 23(1), 16-24.
+
+Velasco-Murillo, V., & Navarrete-Hernández, E. (2006). Mortalidad materna en el IMSS, 1991-2005. Un periodo de cambios. Revista Médica del Instituto Mexicano del Seguro Social, 44(1), S121-S128.
+
+Gonzaga-Soriano, M. R., Zonana-Nacach, A., Anzaldo-Campos, M. C., & Olazarán-Gutiérrez, A. (2014). Atención prenatal y mortalidad materna hospitalaria en Tijuana, Baja California. salud pública de méxico, 56(1), 32-39.
+
+Roldán, S. (2009). Grupos de atención inmediata de muerte materna. La Muerte Materna. Acciones y Estrategias hacia una Maternidad Segura, 143-152.
+
+Hernández, B., Langer, A., Romero, M., & Chirino, J. (1994). Factores asociados a la muerte materna hospitalaria en el estado de Morelos, México. Salud pública de México, 36(5), 521-528.
+
+Walker, D. (2007). Desarrollo de políticas para la reducción de la mortalidad materna frente a las metas del milenio. Salud Pública de México, 49, 230.
+
+Velasco Murillo, V., Navarrete Hernández, E., Cardona Pérez, J. A., & Madrazo Navarro, M. (1997). Mortalidad materna por preeclampsia-eclampsia en el Instituto Mexicano del Seguro Social 1987-1996. Rev. méd. IMSS, 451-6.
+
+Velasco MV, Navarrete HE. Mortalidad materna en el Instituto Mexicano del Seguro Social 1992-2001. Gac Med Mex. 2003;139(Suppl: 1):17-22.
+
+Velasco-Murillo V, Navarrete-Hernández E, Cruz-Mejía L. El descenso de la mortalidad materna en el IMSS, 2000-2005. ¿Azar o resultado de acciones específicas?. Rev Med Inst Mex Seguro Soc. 2008;46(2):211-218.
+
+Torres, L. M., Rhenals, A. L., Jiménez, A., Ramírez-Villalobos, D., Urióstegui, R., Piña, M., & Rocha, H. (2014). Búsqueda intencionada y reclasificación de muertes maternas en México: el efecto en la distribución de las causas. salud pública de méxico, 56(4), 333-347.
+
+Hogan, M. C., Saavedra-Avendano, B., Darney, B. G., Torres-Palacios, L. M., Rhenals-Osorio, A. L., Sierra, B. L. V., ... & Lozano, R. (2016). Reclasificación de las causas de muerte obstétrica en México: Un estudio transversal repetido. Bulletin of the World Health Organization, 94(5), 362-369B.
+
+Torres, L. M., Rhenals, A. L., Jiménez, A., Ramírez-Villalobos, D., Urióstegui, R., Piña, M., & Rocha, H. (2014). Intentional search and reclassification of maternal deaths in Mexico: The effect on the distribution of causes. Salud publica de Mexico, 56(4), 333-347.
+
+Aguilar, M. A. R., Báez, M. V. J., Hernández, R. B., & Jurado, L. S. (2018). Caracterización epidemiológica de las muertes maternas en el IMSS Quintana Roo del año 2009 al 2013. Revista CONAMED, 21(3), 132-135.
+
+Arias, L. R. C., Lona, E. L., & Cardiel, J. A. C. (2018). COMPARACIÓN DE CAUSAS DE MUERTE FETAL EN EL ESTADO DE GUANAJUATO DURANTE 2016. JÓVENES EN LA CIENCIA, 4(1), 334-338.
+
+Muñoz, J. B., Muñoz, R. H., Cervantes, A. L. M., Pérez, L. H., Corona, S. M., Velázquez, M. O., ... & Pérez, J. R. (1994). Mortalidad materna en el área huichol del estado de Jalisco, México. Salud Pública de México, 36(3), 263-268.
+
+Ramos, S., Romero, M., Karolinski, A., Mercer, R., Insua, I., & Río Fortuna, C. D. (2004). Para que cada muerte materna importe.
+
+García-Cavazos, R. J. (2017). Maternal and perinatal health in Mexico. Effective interventions lifeline to improve maternal and perinatal health (2015). Ginecología y Obstetricia de México, 84(09).
+
+Hogan, M. C., Saavedra-Avendano, B., Darney, B. G., Torres-Palacios, L. M., Rhenals-Osorio, A. L., Sierra, B. L. V., ... & Lozano, R. (2016). Reclassifying causes of obstetric death in Mexico: a repeated cross-sectional study. Bulletin of the World Health Organization, 94(5), 362.
+
+Aguilar, M. A. R., Báez, M. V. J., Hernández, R. B., & Jurado, L. S. Caracterización epidemiológica de las muertes maternas en el IMSS Quintana Roo del año 2009 al 2013 Epidemiological characterization of maternal deaths at IMSS Quintana Roo from 2009 to 2013.
+
+Organización Mundial de la Salud (OMS). Clasificación Internacional de Enfermedades, X Revisión. Ginebra: OMS; 1992.
+
+del Carmen Elu, M., & Pruneda, E. S. (2004). Mortalidad materna: una tragedia evitable. Perinatología y reproducción humana, 18(1), 44-52.
+
+Lozano R. Cuantificación de las Muertes Maternas por entidad federativa, 2002. Presentación hecha en la Reunión del Grupo Interinstitucional de Salud Reproductiva de México: SSA; 2 de julio del 2003.
+
+Torres, L. M., Rhenals, A. L., Jiménez, A., Ramírez-Villalobos, D., Urióstegui, R., Piña, M., & Rocha, H. (2014). Búsqueda intencionada y reclasificación de muertes maternas en México: el efecto en la distribución de las causas. salud pública de méxico, 56(4), 333-347.
+
+
+
+
+
+
