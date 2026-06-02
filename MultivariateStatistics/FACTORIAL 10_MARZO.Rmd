@@ -1,0 +1,357 @@
+---
+title: "ANALISIS FACTORIAL_MARZO 10"
+author: "Miguel Angel Peñaloza Perez"
+date: "8/4/2021"
+output: word_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r echo=FALSE, message=FALSE,warning=FALSE, tidy=TRUE}
+
+library(readxl)
+#library(readr)
+library(psy)
+library(corrplot)
+library(psych)
+library(semPlot)
+library(readr)
+library(lavaan)
+library(tidyverse)
+library(dplyr)
+```
+
+
+
+Depressive Mood Scale
+Description
+A data frame with 269 observations on the following 20 variables. Jouvent, R et al 1988 La clinique polydimensionnelle de humeur depressive. Nouvelle version echelle EHD : Polydimensional rating scale of depressive mood. Psychiatrie et Psychobiologie.
+
+Usage
+data(ehd)
+Format
+This data frame contains the following columns:
+
+e1
+Observed painfull sadness
+
+e2
+Emotional hyperexpressiveness
+
+e3
+Emotional instability
+
+e4
+Observed monotony
+
+e5
+Lack spontaneous expressivity
+
+e6
+Lack affective reactivity
+
+e7
+Emotional incontinence
+
+e8
+Affective hyperesthesia
+
+e9
+Observed explosive mood
+
+e10
+Worried gesture
+
+e11
+Observed anhedonia
+
+e12
+Felt sadness
+
+e13
+Situational anhedonia
+
+e14
+Felt affective indifference
+
+e15
+Hypersensibility unpleasent events
+
+e16
+Sensory anhedonia
+
+e17
+Felt affective monotony
+
+e18
+Felt hyperemotionalism
+
+e19
+Felt irritability
+
+e20
+Felt explosive mood
+
+Source
+Jouvent, R et al 1988 La clinique polydimensionnelle de humeur depressive. Nouvelle version echelle EHD : Polydimensional rating scale of depressive mood. Psychiatrie et Psychobiologie.
+
+
+  Exploratorio 
+
+Base de datos ehd 
+```{r echo=FALSE, tidy=TRUE}
+data(ehd)
+#datos <- read_xlsx("C:\\Users\\W10\\Desktop\\ESTADISTICA MULTIVARIADA\\ACTIVIDADES\\AF\\FA.xlsx")
+datos<- ehd
+#________________________________________
+# estandarizar variable
+D1=scale(datos)
+#que R lo lea como una matriz de datos y no como una tabla
+D2=as.data.frame(D1)
+head(D2)
+```
+
+
+```{r echo=FALSE, tidy=TRUE}
+  D2%>% pivot_longer(e1:e12)%>% filter(value>0)%>%
+  ggplot(aes(value))+geom_histogram(binwidth = 1,alpha=1/4,fill = "darkblue",
+                                    colour = "black")+facet_wrap(~name)+
+  labs(subtitle="",title="Escala de Estado de Animo Depresivo",x="Categoria de Respuestas",y="Frecuencia",
+       caption="Fuente de los datos: Jouvent, R et al 1988 La clinique polydimensionnelle de humeur depressive.\n Nouvelle version echelle EHD : Polydimensional rating scale of depressive mood.\n Psychiatrie et Psychobiologie.")+
+  theme_bw()
+
+
+  D2%>% pivot_longer(e13:e20)%>% filter(value>0)%>%
+  ggplot(aes(value))+geom_histogram(binwidth = 1,alpha=1/4,fill = "darkblue",
+                                    colour = "black")+facet_wrap(~name,ncol=4)+
+  labs(subtitle="",title="Escala de Estado de Animo Depresivo",x="Categoria de Respuestas",y="Frecuencia",
+       caption="Fuente de los datos: Jouvent, R et al 1988 La clinique polydimensionnelle de humeur depressive.\n Nouvelle version echelle EHD : Polydimensional rating scale of depressive mood. \nPsychiatrie et Psychobiologie.")+
+  theme_bw()
+
+
+
+```
+
+
+Matriz de correlacion
+
+```{r echo=FALSE, tidy=TRUE}
+cor(D2)
+```
+
+```{r echo=FALSE, tidy=TRUE}
+corrplot(cor(D2), method="circle",order="hclust",tl.col='black',tl.cex=.75)
+         
+```
+
+
+
+DETERMINANTE
+```{r echo=FALSE, tidy=TRUE}
+det(cor(D2))
+```
+
+KMO TEST 
+```{r echo=FALSE, tidy=TRUE}
+KMO(cor(D2))
+```
+
+
+ESFERICIDAD
+```{r echo=FALSE, tidy=TRUE}
+print(cortest.bartlett(cor(D2),nrow(datos)))
+         
+```
+
+De acuerdo a las cargas factoriales de los items del cuestionario se opto por omitir de las variables originales las preguntas 8,9,10 y 14 ya que su carga factorial es cercano a .30 por lo que es posible omitirlas del analisis confirmatorio ya que aportan poca informacion al intrumento de medición.
+
+```{r echo=FALSE, tidy=TRUE}
+##ROTACIÓN VARIMAX##
+         FA1=factanal(D2,factors=2,rotation="varimax",na.action=na.omit,scores="Bartlett")
+         LO2=FA1$loadings
+         #LO2# Calcular el número de factores ideal
+        VARIMAX_IDFEAL<- scree.plot(datos,type = 'R')
+         #scoores
+         #variables latentes nuevas
+         SC1=FA1$scores
+         SCF1<-SC1[,1]
+        HISTOGRAMA<- hist(SCF1)
+        CAJAS<- boxplot(SCF1)
+         #summary(SCF1)
+        
+        LO2
+```
+
+```{r echo=FALSE, tidy=TRUE}
+ #BIPLOT para variables con FA1
+         load1=FA1$loadings[,1:2]
+         load2=FA1$loadings[,1:2]
+         BIPLOT_FINAL<-biplot_graph<-plot(load1)
+         text(load1,labels=names(D),cex=.7,adj=c(0.5,1))
+         
+        BIPLOT2<- biplot (load1,load2)
+         text(load1,labels=names(D),cex=.7,adj=c(0.5,1))
+```
+
+
+MODELO CONFIRMATORIO 
+
+En el modelo confirmatorio se puede probar que los dos grupos en los que se conformo el cuestionario depresion y ansiedad son utiles para la evaluacion del humor depresivo.Los items en seleccionados muestran una alta aportacion de informacion asi como tambien las varianzas de los items por lo cual el cuestionario es adecuado para aplicación.
+```{r, tidy=TRUE}
+ modelo_confirm<-'Ansiedad=~ e2 +e3+e4+e5+e6+e7+e15+e18+e19+e20
+Depresion=~ e1+e11+e12+e13+e16+e17'
+         modelo<-cfa(modelo_confirm,data=D2)
+        summary(modelo,fit.measures=TRUE)
+         GRAFICOS<-semPaths(modelo,what="paths",layout="circle",title=TRUE,style="LISREL")
+         #semPaths(modelo,what="est",layout="circle",title=TRUE,style="LISREL")
+         
+```
+
+
+
+Encuesta de Trabajo 
+```{r echo=FALSE, tidy=TRUE}
+#data(ehd)
+datos <- read_xls("C:\\Users\\W10\\Downloads\\Copia_de_Ejercicio_factorial_laboral_1.xls")
+```
+
+
+```{r echo=FALSE, tidy=TRUE}
+datos <- read_xls("C:\\Users\\W10\\Downloads\\Copia_de_Ejercicio_factorial_laboral_1.xls")
+datos<- datos[,9:38]
+# estandarizar variable
+D1=scale(datos)
+#que R lo lea como una matriz de datos y no como una tabla
+D2=as.data.frame(D1)
+head(D2)
+#______________________________________________
+#instalar paquete##
+#install.packages("corrplot")
+#LA MATRIZ DE ENTRADA ES DE CORRELACION 
+MATRIZ_CORRELACION<-cor(D2)
+```
+
+```{r echo=FALSE, tidy=TRUE}
+#library(corrplot)
+GRAFICO_CORRRELACION<-corrplot(cor(D2), method="circle",order="hclust",tl.col='black',tl.cex=.75)
+
+
+```
+
+DETERMINANTE
+
+```{r echo=FALSE, tidy=TRUE}
+#determinante
+determinante<-det(cor(D2))
+determinante
+```
+
+KMO
+
+
+```{r echo=FALSE, tidy=TRUE}
+KMO_TEST<-KMO(cor(D2))
+
+#Prueba de esfericidad de barlet 
+KMO_TEST
+```
+
+ESFERICIDAD
+
+```{r echo=FALSE, tidy=TRUE}
+
+esfericidad<-print(cortest.bartlett(cor(D2),nrow(datos)))
+esfericidad
+```
+
+
+CARGAS FACTORIALES 
+De acuerdo a los valores de las cargas factoriales se omitieron del analisis las preguntas numero 3,13,16 y 28 ya que aportaban su apoprte a la carga factorial era menor a .30.
+
+
+```{r echo=FALSE, tidy=TRUE}
+FA=factanal(D2,factors=2,rotation="none",na.action=na.comit) #modelo
+#FA
+LO=FA$loadings 
+U<-FA$uniquenesses    #valores singulares
+#________________________________________---
+# Calcular el número de factores ideal
+FACTOR_IDEAL<- scree.plot(datos,type = 'R') 
+
+LO
+```
+
+EIGENVALORES 
+```{r echo=FALSE, tidy=TRUE}
+FA=factanal(D2,factors=2,rotation="none",na.action=na.comit) #modelo
+#FA
+LO=FA$loadings 
+U<-FA$uniquenesses    #valores singulares
+#________________________________________---
+# Calcular el número de factores ideal
+FACTOR_IDEAL<- scree.plot(datos,type = 'R') 
+U
+
+```
+
+
+grafica de factors
+
+```{r echo=FALSE, tidy=TRUE}
+LO1=FA$loadings[,1:2]
+GRAFICO_FACTORES<-plot(LO1)
+text(LO1,labels = names(D),cex =.7,adj = c(0.5,1))
+```
+
+VARIABLES LATENTES NUEVAS 
+
+
+```{r echo=FALSE, tidy=TRUE}
+##ROTACIÓN VARIMAX##
+FA1=factanal(D2,factors=2,rotation="varimax",na.action=na.omit,scores="Bartlett")
+LO2=FA$loadings
+#LO2# Calcular el número de factores ideal
+VARIMAX_IDFEAL<- scree.plot(datos,type = 'R')
+#scoores
+#variables latentes nuevas
+SC1=FA1$scores
+SCF1<-SC1[,1]
+HISTOGRAMA<- hist(SCF1)
+
+
+HISTOGRAMA
+CAJAS<- boxplot(SCF1)
+CAJAS
+```
+
+
+
+BIPLOT 
+
+
+```{r echo=FALSE, tidy=TRUE}
+load1=FA1$loadings[,1:2]
+load2=FA1$loadings[,1:2]
+BIPLOT_FINAL<-biplot_graph<-plot(load1)
+text(load1,labels=names(D),cex=.7,adj=c(0.5,1))
+
+BIPLOT2<- biplot (load1,load2)
+text(load1,labels=names(D),cex=.7,adj=c(0.5,1))
+
+```
+
+
+MODELO CONFIRMATORIO 
+
+
+
+```{r , tidy=TRUE}
+modelo_confirm<-'G1=~ P4+P9+P10+P11+P12+P15+P17+P18+P19+P21+P22+P23+P24+P25+P26
+G2=~ P1+P2+P5+P6+P7+P8+P14+P20+P27+P29+P30'
+modelo<-cfa(modelo_confirm,data=D2)
+ summary(modelo,fit.measures=TRUE)
+GRAFICOS<-semPaths(modelo,what="paths",layout="circle",title=TRUE,style="LISREL")
+```
+

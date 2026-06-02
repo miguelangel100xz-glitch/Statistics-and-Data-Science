@@ -1,0 +1,230 @@
+---
+title: "PROYECTO"
+author: "Miguel Angel Peñaloza Perez"
+date: "17/3/2021"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r message=FALSE,warning=FALSE,echo=FALSE}
+
+library(readxl)
+library(readr)
+library(ggplot2)
+library(tidyverse)
+
+hemoglobina <- read.csv(head=TRUE,"C:\\Users\\W10\\Desktop\\ESTADISTICA MULTIVARIADA\\ACTIVIDADES\\PCA\\PCA_1_HEMOGLOBI.csv")
+
+ggplot(hemoglobina,aes(IMC))+
+  geom_histogram(fill="blue",colour="black",alpha=0.2)#+
+  scale_y_continuous(labels=scales::percent)
+  
+  hemoglobina%>% 
+  filter(ICC< 10)%>%
+  ggplot(aes(ICC))+
+    geom_histogram(fill="green",colour="black",alpha=0.2)#+
+  scale_y_continuous(labels=scales::percent)
+  
+  
+  ggplot(hemoglobina,aes(HEM))+
+    geom_histogram(fill="orange",colour="black",alpha=0.2)#+
+  scale_y_continuous(labels=scales::percent)
+  
+  
+  ggplot(hemoglobina,aes(GLUC))+
+    geom_histogram(fill="purple",colour="black",alpha=0.2)#+
+  scale_y_continuous(labels=scales::percent)
+  
+  
+  ggplot(hemoglobina,aes(COL))+
+    geom_histogram(fill="red",colour="black",alpha=0.2)#+
+  scale_y_continuous(labels=scales::percent)
+  
+  ggplot(hemoglobina,aes(TRIG))+
+    geom_histogram(fill="pink",colour="black",alpha=0.2)#+
+  scale_y_continuous(labels=scales::percent)
+  
+  
+  select(hemoglobina,IMC:TRIG)%>% 
+    pivot_longer(IMC:TRIG)%>%
+    #filter(name %in% c("COL","GLUC","TRIG"))%>% 
+    ggplot(aes(name,value,fill=name))+
+    geom_boxplot(alpha=1/5,outlier.shape = 16)+
+    guides(fill=FALSE)+
+   # facet_wrap(~name, scales = "free")
+    scale_x_discrete(limits=c("ICC","HEM","IMC","GLUC","COL","TRIG"))+
+    labs(
+      x="",y="",title="TITULO"
+    )
+```
+
+
+Matriz de Varianzas 
+
+```{r}
+d<- select(hemoglobina,IMC:TRIG)
+
+#d <- d %>% filter(TRIG < 500)
+ c<- cov(d)
+
+library(knitr)
+
+kable(c , booktabs = TRUE, align =c("l","c","r","r","c"),col.names =c("IMC","ICC","HEM", "GLUC","COL","TRIG"),escape=FALSE)
+
+```
+
+Matriz de Correlacion
+```{r}
+
+# Obtener matriz R (correlaciones)##
+MR <- cor(d)
+#MR
+
+kable(MR , booktabs = TRUE, align =c("l","c","r","r","c"),col.names =c("IMC","ICC","HEM", "GLUC","COL","TRIG"),escape=FALSE)
+
+```
+
+Representacion de correlaciones 
+Determinante
+
+```{r}
+#Vizualización#
+#install.packages("corrplot")
+library (corrplot)
+S<-cor(d, use="complete.obs")
+corrplot.mixed(S)
+
+
+#kable(S , booktabs = TRUE, align =c("l","c","r","r","c"),col.names =c("IMC","ICC","HEM", "GLUC","COL","TRIG"),escape=FALSE)
+
+o<-det(MR)
+
+cat(c("Determinante: ",o))
+```
+
+
+```{r,warning=FALSE ,echo=FALSE,warning=FALSE}
+
+
+
+d<- select(hemoglobina,IMC:TRIG)
+ c<- cov(d)
+
+library(knitr)
+
+kable(c , booktabs = TRUE, align =c("l","c","r","r","c"),col.names =c("IMC","ICC","HEM", "GLUC","COL","TRIG"),escape=FALSE)
+
+
+# Obtener matriz R (correlaciones)##
+MR <- cor(d)
+#MR
+
+kable(MR , booktabs = TRUE, align =c("l","c","r","r","c"),col.names =c("IMC","ICC","HEM", "GLUC","COL","TRIG"),escape=FALSE)
+
+#Vizualización#
+#install.packages("corrplot")
+library (corrplot)
+S<-cor(d, use="complete.obs")
+corrplot.mixed(S)
+
+
+kable(S , booktabs = TRUE, align =c("l","c","r","r","c"),col.names =c("IMC","ICC","HEM", "GLUC","COL","TRIG"),escape=FALSE)
+
+o<-det(MR)
+
+cat(c("Determinante: ",o))
+
+# instalar paquete psych para obtener KMO y prueba de Bartlett.
+#install.packages('psych')
+library(psych)
+# Prueba de Kaiser-Meyer-Olkin (KMO)
+#KMO(MR)
+
+```
+```{r,echo=FALSE,warning=FALSE}
+KMO(MR)
+```
+
+
+Componente con Matriz de Correlacion
+```{r}
+# Cálculo de componentes con Matriz de correlación
+acp <- prcomp(d, scale. = TRUE)
+
+#:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+# imprimir el análisis de componentes principales
+
+#kable(acp , booktabs = TRUE, align =c("l","c","r","r","c"),row.names =c("IMC","ICC","HEM", "GLUC","COL","TRIG"),escape=FALSE)
+
+
+print(acp)
+```
+
+```{r}
+##Correlación de variables y componentes usando R
+#(corvar <- acp$rotation %*% diag(acp$sdev))
+
+# Ver varianza acumulada
+
+summary(acp)
+
+##Coordenadas Nuevas##
+#acp$x
+```
+
+
+
+
+```{r,echo=FALSE,warning=FALSE}
+# Cálculo de componentes con Matriz de correlación
+acp <- prcomp(d,scale. = TRUE)
+#:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+# imprimir el análisis de componentes principales
+print(acp)
+
+##Correlación de variables y componentes usando R
+(corvar <- acp$rotation %*% diag(acp$sdev))
+
+# Ver varianza acumulada
+summary(acp)
+##Coordenadas Nuevas##
+acp$x
+#:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+##Gráfico de sedimentación (Codo)##
+#install.packages("factoextra")
+library(factoextra)
+fviz_eig(acp)
+#;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+##Gráfico de individuos con un perfil similar (agrupaciones)##
+fviz_pca_ind(acp,
+             col.ind = "cos2", # Color by the quality of representation
+             gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"),
+             repel = TRUE     # Avoid text overlapping
+             )
+#::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+# Default plot
+fviz_pca_var(acp)
+##Gráfica de variables. Las variables correlacionadas positivas 
+#apuntan al mismo lado de la gráfica. Las variables negativas
+#correlacionadas apuntan a lados opuestos del gráfico.##
+#:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+##Biplot
+biplot(acp)
+#factoextra
+fviz_pca_biplot(acp)
+#biplot variables
+fviz_pca_biplot(acp, invisible ="ind")
+#biplot individuos
+fviz_pca_biplot(acp, invisible ="var")
+##biplot  con  factoextra##
+# Seleccionando a los indiviudos
+fviz_pca_biplot(acp, label="var",
+               select.ind = list(contrib = 100))
+
+
+```
+

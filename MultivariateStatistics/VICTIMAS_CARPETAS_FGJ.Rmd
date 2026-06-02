@@ -1,0 +1,157 @@
+---
+title: "Víctimas en carpetas de investigación FGJ"
+author: "Miguel Angel Peñaloza Perez"
+date: "2/4/2021"
+output: word_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r message=FALSE,warning=FALSE,echo=FALSE}
+library(ggplot2)
+library(ggfortify)
+library(knitr)
+library(dplyr)
+library(tidyverse)
+library(patchwork)
+library (corrplot)
+source("VISUALIZACION_DELITOS.R")
+source("ACP_DELITOS.R")
+```
+
+La sigueinte base de datos se extrajo del Portal de Datos Abiertos de la CDMX y contiene la información de las victimas de los delitos en las carpetas de la Fiscalia General de Justicia de la Ciudad de Mexico a partir de enero del 2019. Para informacion detallada de la base de datos consulte la siguiente direccion:
+\url(https://datos.cdmx.gob.mx/dataset/victimas-en-carpetas-de-investigacion-fgj})
+
+Asi tambien de la base de datos solo se analizo la informacion del año 2020 y el mes de enero del 2021 a su vez se opto por analizar solo las 16 alcaldias de la ciudad de Mexico. Por otro lado se omitieron los datos de delitos categorizados como "Hecho no Delictivo". 
+
+De esta forma seleccionamos la información de los delitos siguientes:
+-Homicidio : dentro de este delito esta homicidio y lesiones dolosas por arma de fuego
+-Violacion
+-Delito de Bajo Impacto
+-Robo: dentro de esta categoria estan robo en via o transporte publica y robo casa habitación.
+-Secuestro
+
+Se opto por contabilizar los anteriores delitos ya que los datos tenian multicolinealidad debido a la naturaleza de los datos a analizar. 
+Ejemplo: cuando se comete homicidio el delito es 
+1: homicidio
+2: lesion dolosa por arma de fuego
+
+Es de esta forma que al cometer un delito se contabilizan todas las categorias del delito que estuvieran involucradas en dicho suceso. De acuerdo a lo anterior justificamos la agrupación de las categorias del delito similares.
+
+Asi tambien se obtuvo una tasa de incidencia delictiva por cada 100,000 habitantes con la fomrula siguiente:
+
+
+$$ Tasa=(\frac{EventoInteres}{Población Total})* 100,000$$
+Y los datos del número de poblacion para las 16 alcaldias de la CDMX se obtuvierón del Censo Nacional del año 2020 realizado por el INEGI.
+```{r tidy=TRUE, warning=FALSE,echo=FALSE,message=FALSE}
+source("tasas.R")
+ tasa123<- tasahabitantes %>% select(AlcaldiaHechos,Habitantes)
+kable(tasa123)
+
+```
+
+
+Es asi que la base de datos para el analisis resulto de la manera siguiente.
+```{r tidy=TRUE, warning=FALSE,echo=FALSE,message=FALSE}
+head(nuevo1)
+
+```
+Asi tambien es importante mencionar que la columna secuestro al momento del analisis tenia 4 valores faltantes a los cuales se les asigno un cero por motivos de practicidad para el analis de componentes principales y para que no se omitieran del analisis 4 alcaldias.
+
+```{r warning=FALSE,echo=FALSE,message=FALSE}
+kable(summary(nuevo1))
+
+```
+
+
+## Analisis Descriptivo Exploratorio
+
+```{r warning=FALSE,echo=FALSE,message=FALSE}
+bajo_impacto_graph
+violacion_graph
+homicido_graph
+secuestro_graf
+robo_graph
+
+```
+
+```{r warning=FALSE,echo=FALSE}
+Resumen
+varianzas
+```
+
+
+## Analisis de Componentes Principales
+
+Matriz de Varianzas y Covarianzas
+```{r warning=FALSE,echo=FALSE}
+kable(matriz_varianzas)
+
+```
+
+Matriz de Correlaciones
+```{r warning=FALSE,echo=FALSE}
+kable(matriz_cor)
+```
+
+
+
+
+
+```{r warning=FALSE,echo=FALSE}
+S<-cor(nuevo1, use="complete.obs")
+corrplot.mixed(S)
+```
+
+
+```{r warning=FALSE,echo=FALSE}
+kable(determinante , booktabs = TRUE, align =c("l"),col.names =c("DETERMINANTE"),escape=FALSE)
+```
+
+Varianza Acumulada
+```{r warning=FALSE,echo=FALSE}
+source("ACP_DELITOS.R")
+ acp<- prcomp(nuevo1,scale=TRUE)
+summary(acp)
+
+```
+Valores Singulares
+```{r warning=FALSE,echo=FALSE}
+valores_propios
+```
+
+
+### Combinaciones Lineales 
+```{r warning=FALSE,echo=FALSE}
+kable(combinaciones_lineal)
+```
+
+
+$$PC1 = 0.51* Delito Bajo Impacto + 0.48* Violación + 0.54* Robo$$
+
+
+
+$$PC2 = 0.45* Homicidio Arma de Fuego + 0.83* Secuestro$$
+
+
+
+```{r warning=FALSE,echo=FALSE}
+source("ACP_DELITOS.R")
+library(factoextra)
+fviz_pca_biplot(acp)
+
+fviz_pca_biplot(acp, invisible ="var")
+fviz_pca_biplot(acp, invisible ="ind")
+
+```
+
+
+Variables Latentes
+```{r warning=FALSE,echo=FALSE}
+kable(Rf)
+```
+
+
+

@@ -1,0 +1,148 @@
+---
+title: "Linear discriminan"
+author: "Miguel Angel Peñaloza Perez"
+date: "7/6/2021"
+output: word_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r}
+library(readxl)
+library(dplyr)
+
+
+
+craneo<- read_xlsx( "C:\\Users\\W10\\Desktop\\ESTADISTICA MULTIVARIADA\\ACTIVIDADES\\AVANCE_DE_PROYECTO2\\Libro1.xlsx")
+
+craneo<- craneo %>% mutate(Tipo=as.factor(Tipo))
+
+library(ggplot2)
+library(ggpubr)
+
+p1 <- ggplot(craneo, aes(x = Longitud, fill = Tipo)) +
+      geom_histogram(position = "identity", alpha = 0.5)
+p2 <- ggplot(craneo, aes(x = Anchura, fill = Tipo)) +
+      geom_histogram(position = "identity", alpha = 0.5)
+p3 <- ggplot(craneo, aes(x =Altura, fill = Tipo)) +
+      geom_histogram(position = "identity", alpha = 0.5)
+p4 <- ggplot(craneo, aes(x =Altura_Cara, fill = Tipo)) +
+      geom_histogram(position = "identity", alpha = 0.5)
+
+ggarrange(p1, p2, p3,p4, nrow = 2, common.legend = TRUE)
+
+
+pairs(x = craneo[, c("Longitud","Anchura","Altura","Altura_Cara")],
+      col = c("firebrick", "green3")[craneo$Tipo], pch = 19)
+
+
+library(scatterplot3d)
+scatterplot3d(craneo$Longitud, craneo$Anchura, craneo$Altura,
+              color = c("firebrick", "green3")[craneo$Tipo], pch = 19,
+              grid = TRUE, xlab = "Longitud", ylab = "Anchura",
+              zlab = "Altura", angle = 65, cex.axis = 0.6)
+legend("topleft",
+       bty = "n", cex = 0.8,
+       title = "Dos tipos de Craneo",
+       c("a", "b"), fill = c("firebrick", "green3"))
+
+scatterplot3d(craneo$Longitud, craneo$Anchura, craneo$Altura_Cara,
+              color = c("firebrick", "green3")[craneo$Tipo], pch = 19,
+              grid = TRUE, xlab = "Longitud", ylab = "Anchura",
+              zlab = "Altura Cara", angle = 65, cex.axis = 0.6)
+legend("topleft",
+       bty = "n", cex = 0.8,
+       title = "Dos tipos de Craneo",
+       c("a", "b"), fill = c("firebrick", "green3"))
+
+
+
+nsov1<-
+craneo%>% filter(Tipo==1)%>%
+  ggplot(aes(Longitud, y = ..density..)) +
+  geom_histogram(fill = "cornsilk", colour = "grey60", size = .2) +
+  geom_density()+theme_bw()
+
+nsov2<-
+craneo%>% filter(Tipo==1)%>%
+  ggplot(aes(Anchura, y = ..density..)) +
+  geom_histogram(fill = "cornsilk", colour = "grey60", size = .2) +
+  geom_density()+theme_bw()
+
+nsov3<-
+craneo%>% filter(Tipo==1)%>%
+  ggplot(aes(Altura, y = ..density..)) +
+  geom_histogram(fill = "cornsilk", colour = "grey60", size = .2) +
+  geom_density()+theme_bw()
+
+nsov4<-
+craneo%>% filter(Tipo==1)%>%
+  ggplot(aes(Altura_Cara, y = ..density..)) +
+  geom_histogram(fill = "cornsilk", colour = "grey60", size = .2) +
+  geom_density()+theme_bw()
+
+ggarrange(nsov1, nsov2, nsov3,nsov4, nrow = 2, common.legend = TRUE)
+
+
+
+nsov1<-
+craneo%>% filter(Tipo!=1)%>%
+  ggplot(aes(Longitud, y = ..density..)) +
+  geom_histogram(fill = "cornsilk", colour = "grey60", size = .2) +
+  geom_density()+theme_bw()
+
+nsov2<-
+craneo%>% filter(Tipo!=1)%>%
+  ggplot(aes(Anchura, y = ..density..)) +
+  geom_histogram(fill = "cornsilk", colour = "grey60", size = .2) +
+  geom_density()+theme_bw()
+
+nsov3<-
+craneo%>% filter(Tipo!=1)%>%
+  ggplot(aes(Altura, y = ..density..)) +
+  geom_histogram(fill = "cornsilk", colour = "grey60", size = .2) +
+  geom_density()+theme_bw()
+
+nsov4<-
+craneo%>% filter(Tipo!=1)%>%
+  ggplot(aes(Altura_Cara, y = ..density..)) +
+  geom_histogram(fill = "cornsilk", colour = "grey60", size = .2) +
+  geom_density()+theme_bw()
+
+ggarrange(nsov1, nsov2, nsov3,nsov4, nrow = 2, common.legend = TRUE)
+
+
+nsov4<-
+craneo%>% filter(Tipo!=1)%>%
+  ggplot(aes(Altura_Cara, y = ..density..)) +
+  geom_histogram(fill = "cornsilk", colour = "grey60", size = .2) +
+  geom_density()+theme_bw()
+
+#library(reshape2)
+#library(knitr)
+#library(dplyr)
+qqnorm(craneo$Longitud)
+qqnorm(craneo$Anchura)
+qqnorm(craneo$Altura)
+qqnorm(craneo$Altura_Cara)
+
+
+#datos_tidy <- melt(craneo, value.name = "valor")
+#d<-datos_tidy %>% group_by(Tipo, variable) %>% 
+ # summarise(p_value_Shapiro.test = shapiro.test(valor)$p.value)
+#kable(d)
+
+#PARA PROBAR NORMALIDAD MULTIVARIANTE
+#install.packages("MVN")
+#library(MVN)
+#outliers <- mvn(data = craneo[,-6], mvnTest = "royston", multivariateOutlierMethod = "quan")
+#kable(outliers)
+#royston_test <- mvn(data = craneo[,-6], mvnTest = "royston", multivariatePlot = "qq")
+#kable(royston_test$multivariateNormality)
+
+
+
+```

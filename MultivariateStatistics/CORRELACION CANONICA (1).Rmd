@@ -1,0 +1,81 @@
+---
+title: "CORRELACION CANONICA"
+author: "Miguel Angel Peñaloza Perez"
+date: "15/5/2021"
+output: word_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r ,message=FALSE,warning=FALSE,echo=FALSE,tidy=TRUE}
+library (fields) 
+library (CCA) 
+library(kableExtra)
+library(dplyr)
+library(ggplot2)
+#Llamar datos por separado matriz Y
+#especiesY<- 
+#especiesY
+
+# Asignar nombre a las filas del archivo que sean los nombres de los sitios
+#rownames(especiesY) <- especiesY$sitio
+#especiesY
+# Eliminar la primera variable
+#y<- especiesY[-1]
+y<- read.csv(header=TRUE, "C:\\Users\\W10\\Desktop\\ESTADISTICA MULTIVARIADA\\ACTIVIDADES\\CORRELACION CANONICA\\X.csv")
+y<- na.omit(y)
+
+#Llamar datos por separado matriz X
+#ClimaX <- read.delim('clipboard')
+#ClimaX
+
+# Asignar nombre a las filas del archivo que sean los nombres de los sitios
+#rownames(ClimaX) <- ClimaX$sitio
+#ClimaX
+# Eliminar la primera variable
+#x <- ClimaX[-1]
+x<-read.csv(header=TRUE,"C:\\Users\\W10\\Desktop\\ESTADISTICA MULTIVARIADA\\ACTIVIDADES\\CORRELACION CANONICA\\Y.csv")
+M<-matcor(x,y)  
+M 
+kable(M$Xcor)
+kable(M$Ycor)
+kable(M$XYcor)
+
+
+CC <- cc (x, y) 
+CC
+kable(CC$cor)
+kable(CC$xcoef)
+kable(CC$ycoef)
+kable(CC$scores)
+# Variables canónicas
+#gala$cor
+img.matcor(M, type = 2) 
+barplot(CC$cor,ylim = c(0,1)) 
+plt.cc(CC,var.label=T)
+
+#install.packages("PerformanceAnalytics")
+library(PerformanceAnalytics)
+
+chart.Correlation(data, histogram = TRUE, method = "pearson")
+
+data<-read.csv(header=TRUE,"C:\\Users\\W10\\Desktop\\ESTADISTICA MULTIVARIADA\\ACTIVIDADES\\CORRELACION CANONICA\\exploratorio.csv")
+varianzas<-
+    data%>% 
+    pivot_longer(Peso:Saltos)%>%
+    #filter(name %in% c("COL","GLUC","TRIG"))%>% 
+    ggplot(aes(name,value,fill=name))+
+    geom_boxplot(alpha=2/3,outlier.shape = 16)+
+    guides(fill=FALSE)+theme_bw()+
+    guides(colour=FALSE,fill=FALSE)+
+    coord_flip()+
+    labs(title="Rendimiento Físico",
+         x="",
+         y="",
+         caption="Fuente: Elaboración propia.")
+varianzas
+
+```
+

@@ -1,0 +1,34 @@
+---
+title: "VISUAL CANONICA"
+author: "Miguel Angel Peñaloza Perez"
+date: "7/6/2021"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+
+mm <- read.csv("https://stats.idre.ucla.edu/stat/data/mmreg.csv")
+colnames(mm) <- c("Control", "Concept", "Motivation", "Read", "Write", "Math", 
+                  "Science", "Sex")
+summary(mm)
+
+colnames(mm) <- c("Locus", "Autoconcepto", "Motivacion", "Lectura", "Escritura", "Matematicas", 
+                  "Ciencias", "Sexo")
+summary(mm)
+
+
+mm%>%mutate(Sexo=as.factor(Sexo))%>%ggplot(aes(Locus,fill=Sexo))+geom_histogram()+facet_wrap(~Sexo)+guides(fill=FALSE)
+
+
+
+
+ggplot(mm,aes(Locus),fill=Sex)+geom_histogram()
+
+
+
+```
+

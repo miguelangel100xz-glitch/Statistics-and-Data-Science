@@ -1,0 +1,71 @@
+---
+title: "Untitled"
+author: "Miguel Angel Peñaloza Perez"
+date: "7/6/2021"
+output: word_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r echo=FALSE, message=FALSE,tidy=TRUE, warning=FALSE}
+library(dplyr)
+library(kableExtra)
+library(ggplot2)
+melbourne<- read.csv(header=TRUE,"C:\\Users\\W10\\Desktop\\ESTADISTICA MULTIVARIADA\\ACTIVIDADES\\AVANCE_DE_PROYECTO2\\K_MEDIAS.csv")
+melbourne<-na.omit(melbourne)
+
+melbourne1<- select(melbourne,-Type,-Method,-SellerG,-Date,-Postcode,-YearBuilt,-CouncilArea,-Lattitude,-Longtitude,-X)
+melbourne1<-melbourne1 %>% mutate(Direccion=Address,Recamaras=Rooms,Precio=Price,
+                                  Distancia_c=Distance,Dormitorios=Bedroom2,Sanitarios=Bathroom,
+                                  Cocheras=Car,Tam_propiedad=Landsize,Tam_edificio=BuildingArea,N_propiedades=Propertycount)
+
+melbourne1 <-select(melbourne1,Regionname,Direccion,Recamaras,Precio,Distancia_c,Dormitorios,Sanitarios,Cocheras,Tam_propiedad,Tam_edificio,N_propiedades)
+
+melbourne2<- dplyr::select(melbourne1,Regionname,Direccion,Recamaras,Precio,Distancia_c,Dormitorios,Sanitarios,Cocheras,Tam_propiedad,Tam_edificio)
+kable(summary(melbourne2[,-1]))
+
+kable(head(melbourne2))
+head(melbourne1)
+
+ggplot(melbourne2,aes(Recamaras,y=(..count..)/sum(..count..),fill=Regionname))+geom_bar()+
+  scale_y_continuous(labels=scales::percent)+#theme_bw()+
+  labs(title="Recamaras",subtitle = "Descriptivos: \nMinimo: 1 recamara\nMediana:3 recamaras\nMaximo:8 recamaras",y="Porcentaje",x="Número de Recamaras",caption="Fuente:Elaboración propia con R 4.0.4")+guides(fill=FALSE)+facet_wrap(~Regionname)
+
+
+melbourne2%>%mutate(Región=Regionname,Precio1=if_else(Precio<2000000,"Menor a $$2,000,000","Mayor a $$2,000,000"))%>%
+ggplot(aes(Precio,y=(..count..)/sum(..count..),fill=Región))+geom_histogram()+
+  scale_y_continuous(labels=scales::percent)+#theme_bw()+
+  labs(title="Precio de Alquiler",subtitle = "Descriptivos: \nMinimo: 280,000 dolares \nQ1:668,250 dolares\nMedia:1,105,295 dolares\nQ3:1,352,750 dolares\nMaximo: 5,600,000 dolares",y="Porcentaje",x="Precio en Dolares Australianos",caption="Fuente:Elaboración propia con R 4.0.4")+guides(fill=FALSE)+
+  facet_wrap(~Precio1)+coord_flip()
+
+ggplot(melbourne2,aes(Recamaras,y=(..count..)/sum(..count..),fill=Regionname))+geom_bar()+
+  scale_y_continuous(labels=scales::percent)+#theme_bw()+
+  labs(title="Kilometros del Parque Central",subtitle = "Descriptivos: \nMinimo: 1.20 km\nQ1:6.1 km \nPromedio:10.21 km\nQ3: 13 km\nMaximo:41 km",y="Porcentaje",x="Kilometros de Parque Central",caption="Fuente:Elaboración propia con R 4.0.4")+guides(fill=FALSE)+facet_wrap(~Regionname)
+
+ggplot(melbourne2,aes(Sanitarios,y=(..count..)/sum(..count..),fill=Regionname))+geom_bar()+
+  scale_y_continuous(labels=scales::percent)+#theme_bw()+
+  labs(title="Sanitarios",subtitle = "Descriptivos: \nMinimo: 1 \nMediana:2 \nMaximo:4",y="Porcentaje",x="Número de Sanitarios",caption="Fuente:Elaboración propia con R 4.0.4")+guides(fill=FALSE)+facet_wrap(~Regionname)
+
+
+ggplot(melbourne2,aes(Cocheras,y=(..count..)/sum(..count..),fill=Regionname))+geom_bar()+
+  scale_y_continuous(labels=scales::percent)+#theme_bw()+
+  labs(title="Estacionamientos",subtitle = "Descriptivos: \nMinimo: 0 \nMediana:2 \nMaximo:6",y="Porcentaje",x="Número de Estacionamientos",caption="Fuente:Elaboración propia con R 4.0.4")+guides(fill=FALSE)+facet_wrap(~Regionname)
+
+ggplot(melbourne2,aes(Cocheras,y=(..count..)/sum(..count..),fill=Regionname))+geom_bar()+
+  scale_y_continuous(labels=scales::percent)+#theme_bw()+
+  labs(title="Estacionamientos",subtitle = "Descriptivos: \nMinimo: 0 \nMediana:2 \nMaximo:6",y="Porcentaje",x="Número de Estacionamientos",caption="Fuente:Elaboración propia con R 4.0.4")+guides(fill=FALSE)+facet_wrap(~Regionname)
+
+
+ggplot(melbourne2,aes(Tam_edificio,y=(..count..)/sum(..count..),fill=Regionname))+geom_histogram()+
+  scale_y_continuous(labels=scales::percent)+#theme_bw()+
+  labs(title="Tamaño de Construcción en Metros Cuadrados",subtitle = "Descriptivos: Minimo: 0 m2\nQ1:95.75 m2\nMedia:148.42 m2\nQ3:176 m2\nMaximo: 1022 m2",y="Porcentaje",x="Tamaño en m2",caption="Fuente:Elaboración propia con R 4.0.4")+guides(fill=FALSE)+
+  facet_wrap(~Regionname)+coord_flip()
+
+
+
+```
+
+
