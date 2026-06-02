@@ -1,0 +1,52 @@
+---
+title: "Untitled"
+author: "Miguel Angel Peñaloza Perez"
+date: "14/5/2021"
+output: word_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+$$Yijkl= \mu + \varepsilon(a) il + \gamma j + \delta k + \alpha \delta jk + \gamma \delta jk + \alpha \gamma \delta ijk + \varepsilon(b)ijkl$$
+
+
+$Yijkl$ = Variable de respuesta medida en 60 unidades.
+
+$\mu$ = media general.
+
+$\varepsilon (a) il$ error de parcela principal (zona).
+
+$\alpha (i)$ efecto atribuido en las dos zonas. 
+
+$\gamma j$ efecto atribuido a los tres niveles de tiempo.
+
+$\delta$k  efecto atribuido a los 5 tratamientos de conservacion.
+
+$\varepsilon (b)ijkl$ = erro asociado a la parcela pequeña (tratamientos).
+
+$\alpha \gamma ij$ = interaccion de los niveles de zona y tiempo.
+
+$\alpha \delta jk$ interaccion de zona y tratamiento.
+
+$\gamma\delta$ jk  efecto atribuido a los niveles de tiempo y tratamiento.
+
+
+$\alpha \gamma \delta$ijk interaccion de zona tiempo y tratamientos.
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

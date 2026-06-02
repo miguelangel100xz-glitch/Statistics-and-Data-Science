@@ -1,0 +1,163 @@
+---
+title: "PARCELAS DIVIDIDAS"
+author: "Miguel Angel Peñaloza Perez"
+date: "4/5/2021"
+output: word_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r}
+data<-read.csv(header=TRUE,
+"C:\\Users\\W10\\Desktop\\DISEÑO DE EXP\\PARCELAS DIVIDIDAS\\data_split.csv")
+head(data)
+```
+
+cultivo de arroz, si hay dos variedades y tres edades de las plántulas y queremos más precisión para la edad de las plántulas, entonces con un diseño de bloques completos al azar con tres repeticiones, las variedades se asignan al azar a las parcelas principales dentro de tres bloques usando una aleatorización separada para cada uno. Luego, los niveles de edad de las plántulas se asignan al azar a las subparcelas dentro de las parcelas principales utilizando una aleatorización separada en cada parcela principal. El diseño se muestra en la siguiente tabla.
+
+
+```{r}
+data$var = as.factor(data$var)
+data$age = as.factor(data$age)
+str(data)
+```
+
+```{r}
+library(agricolae)
+attach(data)
+```
+
+
+```{r}
+model <- sp.plot(block = block, 
+                 pplot = var, 
+                 splot = age, 
+                 Y = heading)
+```
+
+
+
+```{r}
+# Get first error df
+Edf_a <- model$gl.a
+Edf_a
+# Get second error df
+Edf_b <- model$gl.b
+Edf_b
+# Get first error MS
+EMS_a <- model$Ea
+EMS_a
+# Get second error MS
+EMS_b <- model$Eb
+EMS_b
+```
+
+
+
+```{r}
+out1 <- LSD.test(y = heading, 
+                 trt = var,
+                 DFerror = Edf_a, 
+                 MSerror = EMS_a,
+                 alpha = 0.05,
+                 p.adj = "bonferroni",
+                 group = TRUE,
+                 console = TRUE)
+
+plot(out1, 
+     xlab = "varieties",
+     ylab = "heading (days)",
+     las = 1, 
+     variation = "IQR")
+
+```
+
+
+
+
+```{r}
+out2 <- LSD.test(y = heading, 
+                 trt = age,
+                 DFerror = Edf_b, 
+                 MSerror = EMS_b,
+                 alpha = 0.05,
+                 p.adj = "bonferroni",
+                 group = TRUE,
+                 console = TRUE)
+
+plot(out2, 
+     xlab = "Siembra",
+     ylab = "Maduracion (dias)",
+     las = 1, 
+     variation = "IQR")
+
+```
+
+```{r}
+out3 <- LSD.test(y = heading, 
+                 trt = var:age,
+                 DFerror = Edf_b, 
+                 MSerror = EMS_b,
+                 alpha = 0.05,
+                 p.adj = "bonferroni",
+                 group = TRUE,
+                 console = TRUE)
+
+
+plot(out3, 
+     xlab = "var:age",
+     ylab = "heading (days)",
+     las = 1, 
+     variation = "IQR")
+
+```
+
+EFECTOS PRINCIPALES
+```{r}
+# variedades
+bar.err(out1$means, 
+        variation = "SE", 
+        ylim = c(0, 100),
+        names.arg = c("Arroz Shaheen","Arroz Super"))
+
+#titulo y leyendas
+title(main = "Especies de Arroz",
+      cex.main = 0.8,
+      xlab = "Varieties", 
+      ylab = "maduracion (dias)")
+
+# edad de plantas
+bar.err(out2$means, 
+        variation = "SE", 
+        ylim = c(0, 100),
+        names.arg = c("2-semanas", "3-semanas", "4-semanas"))
+
+# leyendas
+title(main = "Edades de plantas",
+      cex.main = 0.8,
+      xlab = "Edad", 
+      ylab = "Maduración (dias)")
+```
+
+EFECTOS DE INTERACCION 
+
+```{r}
+bar.err(out3$means, 
+        variation = "SE", 
+        ylim = c(0, 110),
+        names.arg = c("V1W1","V1W2", "V1W3", "V2W1", "V2W2", "V2W3"))
+
+# Adding title, X and Y labels
+title(main = "Interacción especie-edad",
+      cex.main = 0.8,
+      xlab = "variedad:edad", 
+      ylab = "Maduración (días)")
+```
+
+
+
+
+

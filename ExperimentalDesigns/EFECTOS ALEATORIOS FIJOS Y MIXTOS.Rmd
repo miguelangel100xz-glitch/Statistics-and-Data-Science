@@ -1,0 +1,178 @@
+---
+title: "EFECTOS MIXTOS"
+author: "Miguel Angel Peñaloza Perez"
+date: "14/5/2021"
+output: word_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Cuando en la estructura de tratamients de un experiemtno se tienen tanto factores fijos como aleatorios se le llama modelos mixtos.
+
+Si un efecto principal es un efecto aleatorio, entonces cualquier interaccion que involucre tal efecto principal es tambien un efecto aleatorio.
+
+Es decir, las unicas interacciones que son efectos fijos son aquellas cuyos efectos principales son todos fijos.
+
+Para un modelo de tres criterios de clasificacion donde A y B son efectos fijos y C es aleatorio se representa de la siguiente forma:
+
+$Yijkl=\mu +\beta j+\gamma ij+ck+dik+fjk+gijk+\varepsilon ijkl$
+
+Donde la parte de efectos fijos del modelo es:
+
+
+$\mu +  \alpha i + \beta j +\gamma ij$
+
+donde la parte de efectos fijos del modelo es:
+
+$\mu +  \alpha i + \beta j + \gamma ij$
+
+
+y la parte de efectos aleatorios
+
+$ck + d ik + fjk + gijk + \epsilon ijkl$
+
+suponemos que 
+
+ck  $\thicksim$  N $(0,\sigma^2c)$ ,
+
+son variables aleatorias independientes.
+
+
+En el caso mas simple de un modelo mixto, podemos tener dos factores A y B es un efecto aleatorio. En este caso tenemos el siguiente ANOVA.
+
+
+SOURCE     EMS 
+A           $\sigma^2 + nb \frac{\sum \sigma^2}{\alpha -1} + n \sigma^2 \alpha\beta$
+
+B               $\sigma ^2 n a \sigma^2 \beta$           
+A*B           $\sigma^2 + n \sigma^2 \alpha \beta$
+
+ERROR       $\sigma^2$ 
+TOTAL
+
+
+La interaccion AXB es un efecto aleatorio por lo cual un efecto aleatorio cruzado con un efecto fijo tambien es un efecto aleatorio.
+
+F
+
+MSA/MSAB
+MSB/MSE
+MSAB/MSE
+
+La hipotesis nula para un efecto fijo es que los $\alpha i$ es igual
+
+Mientras que la hipotesis nula para el efecto aleatorio de los $\alpha ^2 \beta$  son iguales a cero.
+
+El denominador de la prueb F para el efecto principal del factor A es ahora el MS para la interaccion AXB. Para el factor B y la interaccion A X B el denominador es el MSE.
+
+En el caso de un diseño de tratamiento anidado, donde A es un efecto fijo y B(A) es un efecto aleatorio se tiene lo siguiente:
+
+
+SOURCE            EMS 
+A               $\sigma ^2 \epsilon + n \sigma^2 \beta (\alpha) + bn \frac {\sum\alpha^2i}{\alpha -1}$
+
+
+B           $\sigma^2 \epsilon + n\sigma^2 \beta(\alpha)$
+
+Error         $\sigma^2 \epsilon$
+
+Total 
+
+
+F
+
+A                   MSA/MSB(A)
+B(A)                MSB(A)(MSE)
+
+de esta forma los denominadores de la prueba F son diferentes.
+
+
+
+Se realizo un estudio de autoevaluacion del control del aula por parte de los maestros donde los investigadores quieren comparar las regiones del este y el oeste de los EU por tipo de escuela (publica o privada) y 2 maestros seleccionados en cada escuela. Cada maestro envia puntajes de 2 clases que imparte.
+
+El este y Oeste de EE. UU. tiene el efecto fijo al igual que las escuelas privadas y publicas. Sin embargo el interes esta enfocado en cuanta variacion hay entre profesores (efecto aleatorio).
+
+Entonces este ANOVA es un modelo mixto uno que incluye efectos fijos y aleatorios. Se incluyo al profesor como un efecto aleatorio anidado dentro de los efectos de las combinaciones de tratamientos factoriales(efectos fijos) de region y tipo de escuela.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## Ejemplo 
+Una compañia quiere reemplazar, en una de sus fabricas, las maquinas usadas para hacer cierto componente. Hay tres diferentes marcas de maquinas en el mercado. 
+
+Y el onjetivo de la investigacion es evaluar la productividad de las mquinas cuando son operadas por su propio personas.
+
+Se seleccionaron aleatoriamente seis empleados para participar en el experimento, cada uno de los cuales opero la maquina en tres diferentes ocasiones.
+
+Los datos siguientes son calificaciones globales, que toman en cuenta el numero y calidad de componentes producidos.
+
+El modelo es: 
+
+
+$Yijk = \mu + \tau i + pj + gij+ \epsilon ijk$
+
+$i= 1,2,3$  $j=1,...,6$   $k=1,2,3$
+
+Donde $\mu$ es la media general, $\tau$i efecto del tipo de maquina i, $p$j efecto de la persona j, $gij$ interaccion maquina-persona y $\epsilon ijk$ error asociado a la j-esima persona operando la maquina i en el tiempo k.
+
+
+Los componentes aleatorios correspondientes a las varianza son: 
+
+$Pj\thicksim N(0,\sigma^2g)\epsilon ijk\thicksim N(0,\sigma^2)$
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,177 @@
+---
+title: "ANOVA_EXPLORATORIO"
+author: "Miguel Angel Peñaloza Perez"
+date: "6/5/2021"
+output: word_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r echo=FALSE , message=FALSE, warning=FALSE}
+source("ANOVA.r")
+```
+
+MODELO LINEAL PARCELAS DIVIDIDAS EN BLOQUES AL AZAR 
+
+
+
+
+```{r echo=FALSE , message=FALSE, warning=FALSE}
+library(kableExtra)
+kable(descript_zona)
+```
+
+```{r echo=FALSE , message=FALSE, warning=FALSE}
+library(kableExtra)
+#kable(k , booktabs = TRUE, align =c("l","c","r","r","c"),col.names =c("PC1","PC2","PC3", "PC4","PC5","PC6"),escape=FALSE)
+
+
+kable(tiempo3.1)
+kable(tiempo3.2)
+kable(tiempo3.3)
+
+
+```
+
+```{r echo=FALSE , message=FALSE, warning=FALSE}
+
+T1#+labs(y="Temperatura Farenheit(F)")
+#mperatura Farenheit(F)",x="Tiempo en minutos")
+```
+
+```{r echo=FALSE , message=FALSE, warning=FALSE}
+
+T2#+labs(y="Temperatura Farenheit(F)")
+
+
+```
+
+```{r echo=FALSE , message=FALSE, warning=FALSE}
+T3#+labs(y="Temperatura Farenheit(F)")
+
+```
+
+```{r echo=FALSE , message=FALSE, warning=FALSE}
+interact+labs(y="Temperatura Farenheit",x="Tiempo en minutos")
+```
+
+
+SUPUESTOS DE ANOVA
+
+Normalidad 
+```{r echo=FALSE , message=FALSE, warning=FALSE}
+shapiro.test(minutos2$GRADOS_FAREN)
+qqnorm(minutos2$GRADOS_FAREN)
+shapiro.test(minutos4$GRADOS_FAREN)
+qqnorm(minutos4$GRADOS_FAREN)
+shapiro.test(minutos6$GRADOS_FAREN)
+qqnorm(minutos6$GRADOS_FAREN)
+```
+
+```{r echo=FALSE , message=FALSE, warning=FALSE}
+
+```
+
+
+
+
+Homocedasticidad
+```{r echo=FALSE , message=FALSE, warning=FALSE}
+d<-bartlett.test(GRADOS_FAREN~ZONA,data=data)
+
+kable(d$method)
+d
+```
+
+
+ANOVA 
+
+```{r echo=FALSE , message=FALSE, warning=FALSE}
+attach(data)
+
+model <- sp.plot(block = ZONA, 
+                 pplot = TIEMPO, 
+                 splot = TRATAMIENTO, 
+                 Y = GRADOS_FAREN)
+
+
+kable(model$ANOVA)
+```
+
+
+ANALISIS POST HOC 
+
+```{r echo=FALSE , message=FALSE, warning=FALSE}
+##ANALIZIS POST HOC 
+Edf_a <- model$gl.a
+#Edf_a
+Edf_b <- model$gl.b
+#Edf_b
+EMS_a <- model$Ea
+#EMS_a
+EMS_b <- model$Eb
+#EMS_b
+
+#ZONA GEOGRAFICA
+out1 <- LSD.test(y = GRADOS_FAREN, 
+                 trt = ZONA,
+                 DFerror = Edf_a, 
+                 MSerror = EMS_a,
+                 alpha = 0.05,
+                 p.adj = "bonferroni",
+                 group = TRUE,
+                 console = TRUE)
+
+kable(out1$groups)
+kable(out1$statistics)
+kable(out1$parameters)
+kable(out1$means)
+#kable(out1$comparison)
+
+```
+
+```{r echo=FALSE , message=FALSE, warning=FALSE}
+zona_anova+labs(y="Temperatura Farenheit(F°)",title="",x="",
+       caption="Fuente: Elaboración propia.")
+```
+
+TRATAMIENTOS
+
+```{r echo=FALSE , message=FALSE, warning=FALSE}
+#TRATAMIENTOS
+out1 <- LSD.test(y = GRADOS_FAREN, 
+                 trt = TRATAMIENTO,
+                 DFerror = Edf_b, 
+                 MSerror = EMS_b,
+                 alpha = 0.05,
+                 p.adj = "bonferroni",
+                 group = TRUE,
+                 console = TRUE)
+
+kable(out1$parameters)
+kable(out1$means)
+#kable(out1$comparison)
+kable(out1$groups)
+kable(out1$statistics)
+```
+
+
+```{r echo=FALSE , message=FALSE, warning=FALSE}
+tratamientos_anova +labs(y="Temperatura Farenheit(F°)",title="",x="",
+       caption="Fuente: Elaboración propia.")
+```
+
+
+
+```{r echo=FALSE , message=FALSE, warning=FALSE}
+diferencia +labs(y="Temperatura Farenheit(F°)",title="",x="",
+       caption="Fuente: Elaboración propia.")
+```
+
+
+
+
+
+

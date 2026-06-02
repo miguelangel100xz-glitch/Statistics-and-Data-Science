@@ -1,0 +1,278 @@
+---
+title: "Untitled"
+author: "Miguel Angel Peñaloza Perez"
+date: "23/3/2021"
+output: word_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r message=FALSE, warning = FALSE, echo=FALSE}
+library(ggplot2)
+library(tidyverse)
+library(agricolae)
+
+```
+
+
+Las pruebas que se veran acontinuacion para comparacion de medias son adecuadas cuando los resultados del ANOVA son significativos asi como tambien se cumplen los supuestos para aplicar el analisis de varianza de normalidad, homocedasticidad y independencia. En los siguientes ejemplos ya se comprobaron los supuestos y el ANOVA resulto significativo.  
+
+
+Prueba de Tukey
+Es un metodo pot hoc de ANOVA para la comparacion de medias para comprobar cual de las medias de los tratamientos resulto significativa.
+
+$$ W= q * \sqrt{(CME/r)}$$
+
+Donde q se obtiene de una tabla de valores con los grados de libertad del error y los grados de libertad de los tratamientos, CME es el cuadrado medio de los errores entre numero de tratamientos.
+
+El siguiente ejemplo es de un tratamiento de comparacion de 6 insecticidas y el conteo es de la cantidad de insectos muertos. Una tabla de datos con 72 observaciones y dos variables.
+
+En el siguiente apartado se muestran los primeros cinco resultados de la base de datos y el numero de repeticiones para cada tipo de insecticida.
+
+```{r message=FALSE,echo=FALSE}
+head(InsectSprays)
+InsectSprays%>% count(spray)
+```
+
+
+En el siguiente apartado mostramos los resultados de la prueba honesta de tukey con un nivel de confianza al 95%. (Es importante mencionar que ya se comprobo que las medias son significativas por meio del ANOVA sin embargo nos centraremos directamente en los resultados de a prueba de TUKEY)
+
+```{r message=FALSE,echo=FALSE}
+
+aov.out = aov(count ~ spray, data=InsectSprays)
+TukeyHSD(aov.out)  
+
+
+```
+
+Asi tambien el siguiente grafico cuales de las medias de los tratamientos resulto diferente y a su vez es posible identificar la efectividad de los tratamientos.
+Es asi que el insectivcida FC es el insecticida con mas efectividad en la exterminacion de insectos seguido de FE y FD. Asi tambien es adecuado mencionar que los tratamientos anteriormente mencionados tiene un p-valor de 0.00000.
+```{r message=FALSE,echo=FALSE}
+plot(TukeyHSD(aov.out), las=1)
+```
+
+## Prueba de Bonferroni
+
+La prueba de Bonferroni permite comparar las medias de los t niveles de un factor después de haber rechazado la hipótesis nula (Ho) de igualdad de medias mediante la técnica ANOVA.
+Se basa en la creación de un umbral, el BSD (Bonferroni significant difference) por encima del cual,  la diferencia entre las dos medias será significativa y por debajo del cual esa diferencia no será de estadísticamente significativa. En el Test de Bonferroni el nivel de significación se modifica en función del número de comparaciones a hacer. Esto elimina el problema de hacer comparaciones múltiples y r Reduce el nivel de significación en tal medida que elimine el error de aplicar el test tantas veces al mismo tiempo. La corrección de Bonferroni compensa ese aumento al probar cada hipótesis individual en un nivel significativo de α / m , donde α  es el nivel de alfa general deseado y m es el número de hipótesis.
+
+
+De esta forma se obiene el nivel minimo para que las diferencias sean significativas.
+
+## Base de datos de Insecticidas Prueba de Bonferroni
+
+
+Se toma alfa al 0.05% y los pruebas de hipotesis son combinaciones de 6 en 2 esto nos da un resultado de 15 pruebas de hipotesis.
+$$Critico de Bonferrni = \frac{0.05}{15}= 0.0033=$$
+
+En la siguiente prueba se distingue que los tratamientos con p bajo son los tratamientos AC, AD, AE, BC,BD,BE,CF,DF,EF de acuerdo a lo que menciona el test de bonferroni los insecticidas nos son significativamente diferentes ya que su p valor es menor al valor de correccion de 0.0033.
+
+
+```{r message=FALSE,echo=FALSE}
+with(InsectSprays, pairwise.t.test(x=count, g=spray, p.adjust="bonferroni"))
+```
+
+
+
+
+
+## Factorial Anova 
+Tratamientos de crecimiento de los dientes en cerdos de Guinea.
+
+El siguiente data set tiene el objetivo de medir el efecto de la vitamina c en el crecimiento de los dientes en cerdos de guinea. La variable de respuesta es la longitud de los dientes en 60 unidades experimentales(cerdos). Cada animal recibio de una a tres dosis de niveles de vitamina C (0.5, 1 y 2 mg/dia). Los tratamintos fueron con jugo de naranja (OC) y acido ascorbico (VC) en forma de vitamina C.
+
+En las tablas siguientes se muestran los primeros cinco resultado de la base de datos asi como tambien la cantiad de repeticiones para cada tratameinto.
+
+
+```{r message=FALSE,echo=FALSE}
+ToothGrowth%>% head()
+ToothGrowth%>% count(supp)
+```
+
+Obtenemos Estadisticas exploratorias y descriptivas.
+
+```{r message=FALSE,echo=FALSE}
+ToothGrowth.bak = ToothGrowth
+ ToothGrowth$dose = factor(ToothGrowth$dose,
+                      levels=c(0.5,1.0,2.0),
+                        labels=c("low","med","high"))
+ 
+ ToothGrowth <- ToothGrowth%>% mutate(dose1 = case_when(dose==.5~"baja",
+                                                        dose==1.0~"media",
+                                                        dose==2.0~"alta")) 
+ 
+ summary(ToothGrowth)
+ 
+ with(ToothGrowth, table(supp, dose))
+ 
+ 
+ 
+```
+
+```{r message=FALSE,echo=FALSE}
+aggregate(len ~ supp + dose, ToothGrowth, FUN=mean)
+
+aov.out = aov(len ~ supp * dose, data=ToothGrowth)
+model.tables(aov.out, type="means", se=T)
+```
+Aplicando el ANOVA factorial a la base de datos de el crecimiento de los dientes en los cerdos de guinea observamos dos efectos significativos el de las dosis y el del tipo de suministros de vitamina C.
+Asi como tambien un interaccion significativa entre el tamaño de las dosis y el tipo de tratamiento.
+
+
+```{r message=FALSE,echo=FALSE}
+aov.out = aov(len ~ supp * dose, data=ToothGrowth)
+summary(aov.out)
+
+
+
+```
+Asi tambien aplicando la prueba de Tukey observamos que las interacciones de las dosis resultan significativas para interacciones de dosis de 1 mg y .5 (med-low) mg Asi como tambien dosis 2 mg y .5 mg(high-low)  
+
+```{r message=FALSE,echo=FALSE}
+TukeyHSD(aov.out, which="dose")
+```
+En el siguiente grafico observamos las interacciones entre dosis por tipo de tratamiento y se distingue que la interaccion de la dosis media de 1 mg y el tratamiento de vitamina C aplicado con jugo de naranja es diferente al tratamiento de vitamina C con acido ascorbico.
+
+
+```{r message=FALSE,echo=FALSE}
+with(ToothGrowth, interaction.plot(x.factor=dose, trace.factor=supp,
+                    response=len, fun=mean, type="b", legend=T,
+                     ylab="Tooth Length", main="Interaction Plot",
+                     pch=c(1,19)))
+```
+
+
+
+
+
+
+```{r message=FALSE,echo=FALSE}
+library(agricolae)
+
+ToothGrowth<-ToothGrowth %>% mutate(dose=factor(dose))
+#TukeyHSD(aov.out, which="dose")
+```
+
+## Contrastes ortogonales 
+
+Un contraste orogonal entre I medias es una combinacion lineal de estas medias cuyos coeficientes suman cero. Es asi que H0 es que ciert contraste del valor medio es cero.
+
+Por ejemplo la hipotesis de que m1 es igual a la media de los rendimientos de las otras tres variedades le corresponde el contraste:
+
+$$ z= m1 - \frac{m2+m3+m4}{3} =  3m1-m2-m3-m4 $$
+ Con $$ \lambda = [3-1-1-1]$$ 
+ Asi tambien si la H0 : m1 = m2 = m3 ...= mi y H1: mi >< mj 
+ 
+ 
+ A su vez para dos contrastes son ortogonales si se cumple  $$z1 = \sum \lambda1 \lambda2 =0 $$ por lo tanto la sum de cuadrados asociados a los contrastes son independientes.
+ 
+La estrategia de este método consiste en repartir la suma de cuadrados de los tratamientos entre las diversas  hipótesis  o  contrastes.  La  suma  de  cuadrados  asociada  a  cada  contraste  se  usa  como numerador y el cuadrado medio del error como denominador para calcular razones F y comprobar su significación (valor P)
+
+Metodo de contrastes ortogonales con base de datos aplicacion de vitamina C con objetivo de crecimiento de dientes de cerdos de guinea con variable de respuesta crecimiento de los dientes.
+Con la prueba de contrastes ortogonales se puede observar los contrates de tratamientos sin embargo este resultado lo proporciona el ANOVA. Asi tambien nos muestra el contraste de dosis de vitamina C lo cual es util para identificar los metodos mas efectivos en el crecimiento de los dientes en los cerdos de guinea por medio de las interacciones entre las dosis suministradas de vitamina C.
+
+```{r message=FALSE,echo=FALSE}
+contrasts(ToothGrowth$supp)
+
+contrasts(ToothGrowth$dose)
+
+options(contrasts = c("contr.helmert","contr.poly"))
+ contrasts(ToothGrowth$supp)
+ 
+ 
+ contrasts(ToothGrowth$dose)
+ 
+ aov.out2 = aov(len ~ supp * dose, data=ToothGrowth)
+ 
+ summary(aov.out2, split=list(
+                     supp=list("OJ vs VC"=1),
+                     dose=list("low vs med"=1,"low.med vs high"=2)),
+                  expand.split=F
+)
+ 
+ options(contrasts = c("contr.treatment","contr.poly"))
+```
+
+
+## PRUEBA DE DUNCAN 
+
+ Se ordenan de manera creciente los resultados promedios del experimento 
+
+ Se comparan las medias ordenadas se comienza a comparar en el siguiente orden:
+
+ El promedio más alto, con el más bajo, comparando esta diferencia con el intervalo mínimo significativo $R_{t}  Si esta diferencia es no significativa entonces todas las otras diferencias son no significantes. Si la diferencia es significativa se continua con lo siguiente.
+ Posteriormente se calcula la diferencia entre el valor más alto y el penúltimo y se compara con el intervalo mínimo significativo $R_{t-1}$
+ Este procedimiento se continúa hasta que todas las medias se han comparado con la media más grande.
+A continuación se compara la segunda media más grande  con la más pequeña y se compara con el intervalo mínimo significativo $R_{t-1}$ 
+
+Para Bloques Aleatorizados
+
+La siguiente base de datos compara tipos de material y la variable de respuesta es la altura en metros de eucaliptos.
+
+```{r message=FALSE,echo=FALSE}
+library(data.table)
+DBA <- fread("https://archive.org/download/byrong_DBA1/DBA1.txt",header=TRUE, sep="\t", dec=",")
+head(DBA)
+```
+
+
+
+```{r message=FALSE,echo=FALSE}
+TRB<- factor(DBA$Material)
+BLOQ<-factor(DBA$Bloque)
+ALT<-as.vector(DBA$Altura)
+ALT1<-as.numeric(ALT)
+boxplot(split(ALT1,TRB),xlab="Clones de eucalipto", ylab="Altura en metros")
+
+
+ggplot(DBA, aes(x = Material, y = Altura)) +
+  geom_boxplot()+
+       coord_flip()
+       
+```
+
+
+Observamos el resutado del ANOVA 
+Para aplicar la prueba de duncan se bisca en las tablas de amplitudes estandarizadas de duncan 
+Con un alfa al 0.05% con 22 grados libertad del error.
+
+Y un valor p de tablas para cada media de acuerdo al orden de mayor a menor.
+Consultar tabla en http://www.uaaan.mx/~jmelbos/tablas/duncan.pdf
+
+```{r message=FALSE,echo=FALSE}
+resaov<-aov(ALT1 ~ BLOQ + TRB)
+anova(resaov)
+```
+
+
+
+```{r message=FALSE,echo=FALSE}
+
+library(agricolae)
+outLSD <-LSD.test(resaov, "TRB",group=T,console=TRUE)
+```
+
+### Prueba de Scheffe
+
+El método de Scheffé es un procedimiento de comparación múltiple de un solo paso que se aplica al conjunto de estimaciones de todos los posibles contrastes entre las medias de nivel de factor.
+En este caso el valor critico de F es de 2.0345.
+
+```{r message=FALSE,echo=FALSE}
+scheffe.test(resaov, "TRB",console=TRUE)
+```
+
+
+
+## Bibliografia 
+
+-García Leal, J. & Lara Porras, A.M.(1998).“Diseño Estadístico de Experimentos.Análisis de la Varianza.”Grupo Editorial Universitario.
+
+-R Tutorials by William B. King, Ph.D http://ww2.coastal.edu/kingw/statistics/R-tutorials/
+
+
+
+
+

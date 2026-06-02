@@ -1,0 +1,86 @@
+---
+title: "TEORIA DISE"
+author: "Miguel Angel Peñaloza Perez"
+date: "11/5/2021"
+output: word_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+DISEÑO COMPLETAMENTE AL AZAR 
+
+Son diseños que se realizan en condiciones controladas. Los tratamientos se asignan al azar sobre unidades experimentales. El modelo matematico es el siguiente:
+
+$Yij=\mu + \gamma i + \varepsilon ij$
+
+$H0: \gamma 1 = \gamma 2= .. = \gamma t$
+
+
+$H1: \gamma i \neq \gamma j$
+
+$\forall ~i \neq j$
+
+
+## NORMALIDAD 
+
+$H0:Y \thicksim N(\mu, \sigma ^2)$
+
+$H1:Y \nsim N(\mu, \sigma ^2)$
+
+## Homogeneidad de varianza 
+
+$H0: \sigma^21 =\sigma^22=...=\sigma^2t$
+
+$H1: \sigma^2i \neq \sigma^2j$
+
+
+$\forall ~ i \neq j$ 
+
+
+DISEÑO CUDRADO LATINO 
+
+$Yij(t)=\mu + \alpha (t) + \beta i+ kj + \varepsilon ij$
+
+$yij$  medicion de la observacion del rengln i-esimo de la columna j-esima
+
+$\alpha i$ efecto del renglon i
+
+$\gamma j$ efecto de la columna j
+
+
+$\tau k$ efecto del tratamiento k 
+
+
+$\varepsilon ij$ error
+
+
+# factorial
+$Yijk = \mu + Ai + Bj + (AB)ij + \varepsilonijk$
+
+$H0: Ai =0  ~~~vs ~~ Ai\neq 0$
+
+$H0: Bi =0  ~~~vs ~~ Bi\neq 0$
+
+$H0: (AB)ij =0  ~~~vs ~~ (AB)ij\neq 0$
+
+### bloques al azar 
+
+
+$Yij = \mu + \tau i + \betaj + \varepsilon  ij ~~~~i=1,...,t~~~j=1,...b$
+
+$\mu$ media general 
+
+
+$\tau i$ efecto del i-esmio tratamiento
+
+$\beta j$ efecto de j-esimo bloque
+
+$\varepsilon ij$ error experimental en la unidad j del tratamiento i
+
+$\varepsilon ij \thicksim N(0,\sigma^2)$
+
+
+
+
