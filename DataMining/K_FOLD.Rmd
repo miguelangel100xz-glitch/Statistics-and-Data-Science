@@ -1,0 +1,204 @@
+---
+title: "K-FOLD"
+author: "Miguel Ángel Peñaloza Pérez"
+date: "24/11/2021"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+La validación cruzada se refiere a un conjunto de métodos para medir el rendimiento de un modelo predictivo dado en nuevos conjuntos de datos de prueba.
+
+La idea básica, detrás de las técnicas de validación cruzada, consiste en dividir los datos en dos conjuntos:
+
+El conjunto de entrenamiento, utilizado para entrenar (es decir, construir) el modelo;
+y el conjunto de prueba (o conjunto de validación), utilizado para probar (es decir, validar) el modelo estimando el error de predicción.
+La validación cruzada también se conoce como método de remuestreo porque implica ajustar el mismo método estadístico varias veces utilizando diferentes subconjuntos de datos.
+
+Métricas de rendimiento del modelo
+
+Después de construir un modelo, estamos interesados en determinar la precisión de este modelo para predecir el resultado de nuevas observaciones invisibles que no se usaron para construir el modelo.(Error de predicción)
+Para ello, la estrategia básica es:
+
+-Construya el modelo en un conjunto de datos de entrenamiento
+
+-Aplicar el modelo en un nuevo conjunto de datos de prueba para hacer predicciones
+
+R cuadrado (R2), que representa la correlación al cuadrado entre los valores de resultado observados y los valores predichos por el modelo. Cuanto mayor sea el R2 ajustado, mejor será el modelo.
+Error cuadrático medio (RMSE), que mide el error de predicción promedio realizado por el modelo al predecir el resultado de una observación. Es decir, la diferencia promedio entre los valores de resultado conocidos observados y los valores predichos por el modelo. Cuanto menor sea el RMSE, mejor será el modelo.
+
+Error absoluto medio (MAE), una alternativa al RMSE que es menos sensible a los valores atípicos. Corresponde a la diferencia absoluta promedio entre los resultados observados y pronosticados. Cuanto menor sea el MAE, mejor será el modelo.
+
+En el entorno de clasificación, la tasa de error de predicción se estima como la proporción de observaciones mal clasificadas.
+
+R2, RMSE y MAE se utilizan para medir el rendimiento del modelo de regresión durante la validación cruzada.
+
+Métodos de validación cruzada
+
+Brevemente, los algoritmos de validación cruzada se pueden resumir de la siguiente manera:
+
+-Reserve una pequeña muestra del conjunto de datos.
+
+-Construya (o entrene) el modelo usando la parte restante del conjunto de datos.
+
+-Pruebe la efectividad del modelo en la muestra reservada del conjunto de datos.
+
+-Si el modelo funciona bien en el conjunto de datos de prueba, entonces es bueno.
+
+
+El enfoque del conjunto de validación
+
+El enfoque del conjunto de validación consiste en dividir aleatoriamente los datos en dos conjuntos: un conjunto se usa para entrenar el modelo y el otro conjunto restante se usa para probar el modelo.
+
+El proceso funciona de la siguiente manera:
+
+-Construya (entrene) el modelo en el conjunto de datos de entrenamiento.
+
+-Aplicar el modelo al conjunto de datos de prueba para predecir el resultado de nuevas observaciones invisibles.
+
+-Cuantifique el error de predicción como la diferencia cuadrática media entre los valores de resultado observados y predichos.
+
+-El siguiente ejemplo divide el conjunto de datos suizos de modo que el 80% se utilice para entrenar un modelo de regresión lineal y el 20% se utilice para evaluar el rendimiento del modelo.
+
+
+
+Predicción del puntaje de fertilidad sobre la base de indicadores socioeconómicos.
+
+```{r}
+library(tidyverse)
+library(caret)
+# Load the data
+data("swiss")
+# Inspect the data
+sample_n(swiss, 3)
+
+```
+
+```{r warning=FALSE, echo=FALSE}
+swiss%>%pivot_longer(cols=c("Agriculture","Examination","Education","Catholic","Infant.Mortality"))%>%ggplot(aes(value,Fertility,color=name))+geom_point()+facet_wrap(~name,scales = "free")+geom_smooth(method = "lm")+guides(color=FALSE)+labs(caption="Elaboración propia con R Studio",x="Puntuación",y="Fertilidad",title="Swiss Fertility and Socioeconomic Indicators (1888)")
+```
+
+
+
+```{r}
+# Split the data into training and test set
+set.seed(123)
+training.samples <- swiss$Fertility %>%
+  createDataPartition(p = 0.8, list = FALSE)
+train.data  <- swiss[training.samples, ]
+test.data <- swiss[-training.samples, ]
+# Build the model
+model <- lm(Fertility ~., data = train.data)
+# Make predictions and compute the R2, RMSE and MAE
+predictions <- model %>% predict(test.data)
+data.frame( R2 = R2(predictions, test.data$Fertility),
+            RMSE = RMSE(predictions, test.data$Fertility),
+            MAE = MAE(predictions, test.data$Fertility))
+```
+
+Al comparar dos modelos, el que produce el RMSE de muestra de prueba más bajo es el modelo preferido.
+
+El RMSE y el MAE se miden en la misma escala que la variable de resultado. Dividir el RMSE por el valor promedio de la variable de resultado le dará la tasa de error de predicción, que debe ser lo más pequeña posible:
+
+```{r}
+RMSE(predictions, test.data$Fertility)/mean(test.data$Fertility)
+```
+
+## Validación cruzada - LOOCV
+
+Este método funciona de la siguiente manera:
+
+-Deje fuera un punto de datos y construya el modelo sobre el resto del conjunto de datos
+
+-Pruebe el modelo contra el punto de datos que se dejó fuera en el paso 1 y registre el error de prueba asociado con la predicción.
+
+-Repita el proceso para todos los puntos de datos.
+
+-Calcule el error de predicción general tomando el promedio de todas estas estimaciones de error de prueba registradas.
+
+La ventaja del método LOOCV es que utilizamos todos los puntos de datos para reducir el sesgo potencial.
+
+Sin embargo, el proceso se repite tantas veces como puntos de datos, lo que resulta en un mayor tiempo de ejecución cuando n es extremadamente grande.
+
+Además, probamos el rendimiento del modelo contra un punto de datos en cada iteración. Esto puede resultar en una mayor variación en el error de predicción, si algunos puntos de datos son valores atípicos. Por lo tanto, necesitamos una buena proporción de puntos de datos de prueba, una solución proporcionada por el método de validación cruzada de k-fold.
+
+```{r}
+# Define training control
+train.control <- trainControl(method = "LOOCV")
+# Train the model
+model <- train(Fertility ~., data = swiss, method = "lm",
+               trControl = train.control)
+# Summarize the results
+print(model)
+```
+
+## Validación cruzada de K-fold
+
+El método de validación cruzada de k-veces evalúa el rendimiento del modelo en diferentes subconjuntos de los datos de entrenamiento y luego calcula la tasa de error de predicción promedio. El algoritmo es el siguiente:
+
+-Divida aleatoriamente el conjunto de datos en k-subconjuntos (o k-veces).
+
+-Reserve un subconjunto y entrene el modelo en todos los demás subconjuntos.
+
+-Pruebe el modelo en el subconjunto reservado y registre el error de predicción.
+
+-Repita este proceso hasta que cada uno de los k subconjuntos haya servido como conjunto de prueba.
+
+-Calcule el promedio de los k errores registrados. Esto se denomina error de validación cruzada que sirve como métrica de rendimiento para el modelo.
+
+-La validación cruzada (CV) de K-fold es un método robusto para estimar la precisión de un modelo.
+
+La ventaja más obvia de k-veces CV en comparación con LOOCV es computacional. Una ventaja menos obvia pero potencialmente más importante del CV de k veces es que a menudo proporciona estimaciones más precisas de la tasa de error de prueba que LOOCV (James et al. 2014).
+
+El valor más bajo de K está más sesgado y, por lo tanto, no es deseable. Por otro lado, un valor más alto de K está menos sesgado, pero puede sufrir una gran variabilidad. No es difícil ver que un valor más pequeño de k (digamos k = 2) siempre nos lleva hacia el enfoque del conjunto de validación, mientras que un valor más alto de k (digamos k = número de puntos de datos) nos lleva al enfoque LOOCV.
+
+En la práctica, normalmente se realiza una validación cruzada de k veces utilizando k = 5 o k = 10, ya que se ha demostrado empíricamente que estos valores producen estimaciones de la tasa de error de prueba que no sufren ni un sesgo excesivamente alto ni una varianza muy alta.
+
+Validación cruzada de 10 veces para estimar el error de predicción. 
+```{r}
+# Define training control
+set.seed(123) 
+train.control <- trainControl(method = "cv", number = 10)
+# Train the model
+model <- train(Fertility ~., data = swiss, method = "lm",
+               trControl = train.control)
+# Summarize the results
+print(model)
+```
+
+
+## Validación cruzada repetida de K-fold
+
+El proceso de dividir los datos en k-folds se puede repetir varias veces, esto se denomina validación cruzada repetida de k-folds.
+
+El error final del modelo se toma como el error medio del número de repeticiones.
+
+Validación cruzada de 10 veces con 3 repeticiones:
+
+```{r}
+# Define training control
+set.seed(123)
+train.control <- trainControl(method = "repeatedcv", 
+                              number = 10, repeats = 3)
+# Train the model
+model <- train(Fertility ~., data = swiss, method = "lm",
+               trControl = train.control)
+# Summarize the results
+print(model)
+```
+
+
+## Bibliografia 
+James, Gareth, Daniela Witten, Trevor Hastie, and Robert Tibshirani. 2014. An Introduction to Statistical Learning: With Applications in R. Springer Publishing Company, Incorporated.
+
+http://www.sthda.com/english/articles/38-regression-model-validation/157-cross-validation-essentials-in-r/
+
+https://rpubs.com/rdelgado/405322
+
+
+
+
+
+
